@@ -1,0 +1,80 @@
+@import "tailwindcss";
+@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/inter-400.ttf') format('truetype'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/inter-500.ttf') format('truetype'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/inter-700.ttf') format('truetype'); }
+:root { --foreground: #52555b; --active: #14161b; --bar: #397c9b; --bar-track: #aecfd0; --border: rgb(0 0 0 / 12%); }
+* { box-sizing: border-box; }
+body { margin: 0; background: white; color: var(--foreground); font-family: Inter, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
+button:disabled { cursor: not-allowed; }
+button:hover:not(:disabled) { background: #f3f5f6; }
+:focus-visible { outline: 2px solid var(--bar); outline-offset: 3px; }
+h1, h2, h3, p, dl, dd, ul { margin: 0; }
+ul { list-style: none; padding: 0; }
+.site-shell { width: 100%; max-width: 1246px; margin: 0 auto; }
+.toolbar { position: sticky; top: 0; z-index: 10; height: 58px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; background: white; }
+.toolbar button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 5px 12px; border-radius: 12px; font-size: 10px; line-height: 12px; font-weight: 700; }
+.toolbar button:last-child { padding-inline: 16px; }
+.resort-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding-top: 10px; }
+.resort-card { min-width: 0; padding: 10px 10px 24px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.resort-heading { height: 44px; }
+.resort-heading p { font-size: 14px; line-height: 20px; font-weight: 500; }
+.resort-heading h2 { font-size: 20px; line-height: 28px; font-weight: 700; }
+.photo-gallery { display: flex; gap: 10px; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 12px; }
+.photo-gallery::-webkit-scrollbar { display: none; }
+.photo { position: relative; flex: 0 0 calc(100% - 35px); height: 203px; border-radius: 12px; overflow: hidden; scroll-snap-align: start; }
+.photo img { object-fit: cover; }
+.card-content { display: flex; flex-direction: column; gap: 12px; }
+.overview { width: calc(100% - 6px); display: flex; flex-direction: column; gap: 10px; }
+.tags { min-height: 28px; display: flex; align-items: center; gap: 10px; }
+.tag { display: inline-flex; padding: 4px 8px; border-radius: 12px; font-size: 10px; line-height: 12px; color: black; font-weight: 500; }
+.pass-ikon { background: #c2d7fd; }.pass-indy { background: #ffe4e0; }
+.tier-premium { background: #e87c16; color: white; }.tier-value { background: #fadcc0; }
+.character { display: inline-flex; gap: 4px; align-items: center; font-size: 10px; line-height: 12px; font-weight: 700; }
+.headline-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 44px; }
+.headline-facts dt { font-size: 14px; line-height: 20px; font-weight: 500; }
+.headline-facts dd { font-size: 20px; line-height: 28px; font-weight: 700; }
+.highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 8px 0; }
+.highlights li { padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; font-size: 12px; line-height: 16px; font-weight: 700; text-align: center; }
+.highlights img { flex: 0 0 auto; }
+.description { font-size: 16px; line-height: 24px; font-weight: 400; }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px; line-height: 20px; }
+.pros-cons h3 { font-size: 14px; line-height: 20px; font-weight: 700; margin-bottom: 4px; }
+.pros-cons ul { display: flex; flex-direction: column; gap: 4px; }
+.comparisons { width: min(100%, 353px); }
+.comparisons h3 { font-size: 16px; line-height: 20px; font-weight: 700; }
+.comparison-subtitle { font-size: 16px; line-height: 20px; }
+.comparison-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.comparison { width: calc(100% - 4px); height: 40px; padding-block: 2px; }
+.comparison dt { font-size: 12px; font-weight: 700; line-height: 16px; margin-bottom: 4px; }
+.comparison dd { display: flex; align-items: center; gap: 4px; }
+.bar { flex: 1; min-width: 0; height: 16px; border-radius: 8px; background: var(--bar-track); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--bar); }
+.comparison-value { flex: 0 0 92px; padding-inline: 8px; color: black; font-size: 10px; line-height: 12px; font-weight: 700; white-space: nowrap; }
+.terrain { padding: 16px 0 0 4px; margin-top: 4px; }
+.terrain h3 { margin-bottom: 12px; }
+.terrain dl { display: flex; flex-direction: column; gap: 12px; }
+.terrain dl > div { display: flex; align-items: center; justify-content: space-between; }
+.terrain dt { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 16px; font-weight: 700; }
+.terrain dd { flex: 0 0 92px; padding-left: 4px; font-size: 10px; line-height: 12px; font-weight: 700; color: black; }
+.terrain-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.blue-run, .black-run { display: block; width: 12px; height: 12px; background: #1860fa; }.black-run { background: black; transform: rotate(-45deg); }
+.resort-link { width: fit-content; font-size: 10px; line-height: 12px; font-weight: 700; color: #06f; text-decoration: none; }.resort-link:hover { text-decoration: underline; }
+.selection-panel { max-width: 402px; min-height: calc(100dvh - 58px); padding: 20px 10px; }
+.selection-panel h1, .selection-panel h2 { font-size: 14px; line-height: 20px; font-weight: 500; margin-bottom: 16px; }.selection-panel h2 { margin-top: 16px; color: var(--active); }
+.options { display: flex; flex-direction: column; gap: 16px; }
+.options button { display: flex; align-items: center; gap: 16px; text-align: left; font-size: 20px; line-height: 28px; font-weight: 700; padding: 0; min-height: 28px; }
+.options img { flex-shrink: 0; }.options .selected { color: var(--active); }.options button:disabled { color: #cacaca; }
+footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
+.sr-only, .skip-link:not(:focus) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip-link:focus { position: fixed; top: 8px; left: 8px; z-index: 20; padding: 12px; background: white; color: var(--active); }
+@media (min-width: 768px) { .site-shell { padding-inline: 10px; } .resort-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; } .selection-panel { margin: 0 auto; } }
+@media (min-width: 1180px) { .resort-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 374px) { .headline-facts dt { font-size: 12px; } .headline-facts dd { font-size: 18px; } .highlights li { padding-inline: 4px; } .pros-cons { gap: 16px; } .comparison-value { flex-basis: 105px; } .terrain dd { flex-basis: 70px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+/* Keep the original 44px headline row and fixed comparison-label slots. */
+@media (min-width: 375px) { .headline-facts { height: 44px; } }
+.comparison-value { min-width: 0; }
+.site-shell { max-width: 1266px; }
+@media (max-width: 390px) { .comparison-value { flex-basis: 110px; padding-inline: 4px; } }
