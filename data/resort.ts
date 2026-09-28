@@ -1,40 +1,47 @@
 export type TerrainDifficulty = "beginner" | "intermediate" | "advanced";
-export type ResortMedia = {
-  role: "resort" | "trail-map" | "additional";
-  src: string;
-  alt: string;
-} & ({ kind: "image" } | { kind: "video"; poster?: string });
-
+export type Pass = "Ikon" | "Epic" | "Indy";
+export type PrototypeScore = 1 | 2 | 3 | 4 | 5;
+export type ResortMedia = { kind: "image"; role: "resort"; src: string; alt: string };
+export type TerrainParks = { status: "seasonal" } & (
+  { count: number; min?: never; max?: never } | { count?: never; min: number; max: number }
+);
 export type Resort = {
   id: string;
+  slug: string;
   name: string;
-  state: string;
+  state: "Vermont";
   region: string;
-  figmaNode: string;
-  pass: string;
-  tier: string;
-  character: string;
+  coordinates: { latitude: number; longitude: number } | null;
+  figmaNode: string | null;
+  passes: Pass[];
+  tier: string | null;
+  character: string | null;
   media: ResortMedia[];
   annualSnowfallIn: number | null;
   skiableAcres: number | null;
   verticalFt: number | null;
-  averageLiftWaitMinutes: number | null;
-  dayTicketPrice: number | null;
+  trailCount: number | null;
+  liftCount: number | null;
+  summitElevationFt: number | null;
+  baseElevationFt: number | null;
+  liftAccess: { score: PrototypeScore; label: string; status: "prototype" };
+  affordability: { score: PrototypeScore; label: string; priceBand: string; status: "prototype" };
   season: {
     label: string;
-    snowTotalIn: number;
-    projectedOpening: string;
-    openingOrder: number;
+    snowTotalIn: number | null;
+    projectedOpening: string | null;
+    openingOrder: number | null;
+    status: "sample" | "unavailable";
   };
-  // Percentages, with parks deliberately excluded from the difficulty mix.
-  terrain: Record<TerrainDifficulty, number>;
-  // Preserve Page 6's count presentation; percentages support future comparison.
-  trailCounts: Record<TerrainDifficulty, number>;
-  terrainParks: number;
-  description: string;
+  terrain: Record<TerrainDifficulty, number> | null;
+  terrainDetailed?: Record<string, number>;
+  terrainParks: TerrainParks;
+  description: string | null;
+  // Editorial slots remain empty until authored; never synthesize them from metrics.
   highlights: { text: string; iconSrc: string }[];
   pros: string[];
   cons: string[];
   website: string;
-  source: { status: "sample" | "verified"; url: string; note?: string; lastUpdated?: string };
+  sources: { url: string; note: string }[];
+  lastVerified: string | null;
 };

@@ -8,7 +8,7 @@ body { margin: 0; background: white; color: var(--foreground); font-family: Inte
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
 button:disabled { cursor: not-allowed; }
-button:hover:not(:disabled) { background: #f3f5f6; }
+@media (hover: hover) and (pointer: fine) { button:hover:not(:disabled), summary:hover .toolbar-control { background: #f3f5f6; } }
 :focus-visible { outline: 2px solid var(--bar); outline-offset: 3px; }
 h1, h2, h3, p, dl, dd, ul { margin: 0; }
 ul { list-style: none; padding: 0; }
@@ -79,3 +79,65 @@ footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
 .site-shell { max-width: 1266px; }
 @media (max-width: 390px) { .comparison-value { flex-basis: 110px; padding-inline: 4px; } }
 .photo video { width: 100%; height: 100%; object-fit: cover; }
+
+/* Page 6 card headers stick only within their own article, above scrolling content. */
+.filter-navigation { position: sticky; top: 0; z-index: 40; background: white; }
+.resort-card { position: relative; align-self: start; }
+.resort-heading { position: sticky; top: var(--toolbar-height); z-index: 20; height: auto; min-height: 48px; background: white; padding-bottom: 4px; }
+.tags { flex-wrap: wrap; }
+.pass-epic { background: #e3e6f1; }
+.headline-facts { height: auto; }
+.pending-highlight { min-height: 96px; color: #70757c; font-weight: 400 !important; justify-content: center !important; }
+.data-note { font-size: 11px; line-height: 16px; margin-top: 4px; }
+.comparison { height: auto; min-height: 40px; }
+.comparison-value { flex-basis: 136px; white-space: normal; }
+.comparison-value small { display: block; font: inherit; margin-top: 2px; }
+.comparison-subtitle { font-size: 14px; }
+.mountain-stats h3 { font-size: 16px; line-height: 20px; font-weight: 700; margin-bottom: 8px; }
+.mountain-stats dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 12px; line-height: 16px; }
+.mountain-stats dd { font-weight: 700; }
+.site-shell:has(.filter-navigation[open]) { max-width: 402px; padding-inline: 0; }
+.filter-navigation[open] { position: relative; }
+.filter-navigation[open] > .toolbar { position: sticky; top: 0; z-index: 40; }
+.selection-panel { padding: 10px 0 0; }
+.sort-section { padding: 10px 10px 24px; border-bottom: 1px solid var(--border); }
+.filter-section { padding: 20px 10px 24px; }
+.selection-panel h2 { margin: 0 0 16px; color: var(--foreground); }
+.sort-option, .filter-option { position: relative; display: flex; align-items: center; font-size: 20px; line-height: 28px; font-weight: 700; cursor: pointer; min-height: 28px; }
+/* Keep Figma's 44px row cadence with full-height touch targets. */
+.sort-option::before, .filter-option::before { content: ""; position: absolute; inset: -8px 0; }
+.sort-option:has(input:focus-visible), .filter-option:has(input:focus-visible) { outline: 2px solid var(--bar); outline-offset: 4px; }
+.sort-options .selected { color: #1860fa; }
+.sort-option input:checked + span { text-decoration: underline; text-underline-offset: 4px; }
+.filter-option { gap: 16px; color: var(--active); }
+.filter-mark { width: 24px; height: 24px; flex-shrink: 0; }
+.filter-option input:not(:checked):not(:disabled) + .filter-mark img { visibility: hidden; }
+.filter-option input:not(:checked):not(:disabled) + .filter-mark { border: 1px solid var(--border); border-radius: 4px; }
+.menu-bottom { position: sticky; bottom: 0; z-index: 30; border-top: 1px solid var(--border); }
+.empty-results { padding: 32px 16px; }
+.empty-results button { color: #1860fa; text-decoration: underline; }
+
+/* Native disclosure stays tappable before hydration; no touch/hover event emulation. */
+:root { --toolbar-height: 58px; }
+.filter-navigation > summary { list-style: none; cursor: pointer; height: var(--toolbar-height); touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.filter-navigation > summary::-webkit-details-marker { display: none; }
+.filter-navigation > summary::marker { content: ""; }
+.toolbar-control { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 5px 12px; border-radius: 12px; font-size: 10px; line-height: 12px; font-weight: 700; }
+.toolbar-control > * { pointer-events: none; }
+.navigation-close { display: none; }
+.filter-navigation[open] .navigation-open { display: none; }
+.filter-navigation[open] .navigation-close { display: inline-flex; }
+.filter-navigation[open] ~ main, .filter-navigation[open] ~ .back-to-top { display: none; }
+.toolbar button { min-height: 44px; touch-action: manipulation; }
+.menu-bottom { top: auto; }
+.skip-link:focus { z-index: 60; }
+.back-to-top { position: fixed; z-index: 50; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); min-width: 44px; min-height: 44px; padding: 10px 12px; display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--border); border-radius: 12px; background: white; color: var(--foreground); box-shadow: 0 2px 8px rgb(0 0 0 / 10%); font-size: 12px; font-weight: 700; touch-action: manipulation; }
+@media (max-width: 767px) { .back-to-top { bottom: calc(32px + env(safe-area-inset-bottom, 0px)); } }
+
+.terrain, .mountain-stats {
+    display: none;
+}
+button.back-to-top {
+    background: #333;
+    color: #fff;
+}

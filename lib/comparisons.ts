@@ -1,60 +1,69 @@
-import type { Resort } from "../data/resort";
+import type { Resort, TerrainParks } from "../data/resort";
 
-export type MetricKey = "annualSnowfallIn" | "skiableAcres" | "verticalFt" | "averageLiftWaitMinutes" | "dayTicketPrice";
-const number = (value: number) => value.toLocaleString("en-US", { maximumFractionDigits: 1 });
-
+export type MetricKey = "annualSnowfallIn" | "skiableAcres" | "verticalFt" | "liftAccess" | "affordability";
+export const formatNumber = (value: number) => value.toLocaleString("en-US", { maximumFractionDigits: 1 });
 export const comparisonMetrics = [
-  { key: "annualSnowfallIn", label: "Snowfall", higherIsBetter: true, format: (value: number) => `${number(value)} in / year` },
-  { key: "skiableAcres", label: "Mountain size", higherIsBetter: true, format: (value: number) => `${number(value)} acres` },
-  { key: "verticalFt", label: "Vertical drop", higherIsBetter: true, format: (value: number) => `${number(value)} ft` },
-  { key: "averageLiftWaitMinutes", label: "Lift access", higherIsBetter: false, format: (value: number) => `${number(value)} min wait` },
-  { key: "dayTicketPrice", label: "Affordability", higherIsBetter: false, format: (value: number) => `$${number(value)} / day` },
-] as const satisfies readonly { key: MetricKey; label: string; higherIsBetter: boolean; format: (value: number) => string }[];
+  { key: "annualSnowfallIn", label: "Snowfall" },
+  { key: "skiableAcres", label: "Mountain Size" },
+  { key: "verticalFt", label: "Vertical" },
+  { key: "liftAccess", label: "Lift Access" },
+  { key: "affordability", label: "Affordability" },
+] as const;
 
 export function isValidMetric(value: number | null): value is number {
   return value !== null && Number.isFinite(value) && value >= 0;
 }
 
-/** Min–max normalization over an explicit reference cohort, never the visible subset.
- * No variation (including a singleton) earns a neutral 50; missing data earns no score.
- * Values beyond the cohort bounds are clamped. Zero wait/price is valid.
+/** Use the entire V1 dataset as reference, never filtered results or a future selection.
+ * Equal values earn 50. Missing values are unscored; values outside bounds are clamped.
  */
-export function normalize(value: number | null, reference: readonly (number | null)[], higherIsBetter: boolean): number | null {
+export function normalize(value: number | null, reference: readonly (number | null)[]): number | null {
   if (!isValidMetric(value)) return null;
   const valid = reference.filter(isValidMetric);
   if (!valid.length) return null;
   const min = Math.min(...valid), max = Math.max(...valid);
   if (min === max) return 50;
-  const fraction = (value - min) / (max - min);
-  return Math.round(Math.max(0, Math.min(1, higherIsBetter ? fraction : 1 - fraction)) * 100);
+  return Math.max(0, Math.min(100, (value - min) / (max - min) * 100));
+}
+
+export function metricValue(resort: Resort, key: MetricKey): number | null {
+  return key === "liftAccess" || key === "affordability" ? resort[key].score : resort[key];
 }
 
 export function getComparisons(resort: Resort, reference: readonly Resort[]) {
-  return comparisonMetrics.map(metric => {
-    const raw = resort[metric.key];
-    return {
-      key: metric.key,
-      label: metric.label,
-      score: normalize(raw, reference.map(item => item[metric.key]), metric.higherIsBetter),
-      value: isValidMetric(raw) ? metric.format(raw) : "Not available",
-    };
+  return comparisonMetrics.map(({ key, label }) => {
+    const raw = metricValue(resort, key);
+    const prototype = key === "liftAccess" || key === "affordability";
+    const rating = prototype ? resort[key] : null;
+    const score = prototype ? (isValidMetric(raw) && raw >= 1 && raw <= 5 ? raw / 5 * 100 : null)
+      : normalize(raw, reference.map(item => metricValue(item, key)));
+    const value = !isValidMetric(raw) ? "Not available" : rating
+      ? `${rating.score}/5 · ${rating.label}`
+      : `${formatNumber(raw)} ${key === "annualSnowfallIn" ? "in / year" : key === "skiableAcres" ? "acres" : "ft"}`;
+    return { key, label, score, value, prototype, detail: key === "affordability" ? resort.affordability.priceBand : null };
   });
 }
 
 export const sortOptions = [
   { key: "openingOrder", label: "Projected Opening Date", short: "Opening Date" },
-  { key: "snowTotalIn", label: "2025/26 Snow Totals", short: "Snow Totals" },
-  ...comparisonMetrics.map(metric => ({ key: metric.key, label: metric.label, short: metric.label })),
+  { key: "snowTotalIn", label: "Season snowfall (2025/26)", short: "Season Snowfall" },
+  { key: "annualSnowfallIn", label: "Average snowfall", short: "Average Snowfall" },
+  { key: "skiableAcres", label: "Mountain size", short: "Mountain Size" },
+  { key: "verticalFt", label: "Vertical", short: "Vertical" },
+  { key: "liftAccess", label: "Lift access", short: "Lift Access" },
+  { key: "affordability", label: "Affordability", short: "Affordability" },
 ] as const;
-
-export function sortResorts(resorts: readonly Resort[], key: (typeof sortOptions)[number]["key"]): Resort[] {
-  const metric = comparisonMetrics.find(metric => metric.key === key);
-  const higherIsBetter = metric?.higherIsBetter ?? key === "snowTotalIn";
-  const value = (resort: Resort) => key === "openingOrder" || key === "snowTotalIn" ? resort.season[key] : resort[key];
+export type SortKey = (typeof sortOptions)[number]["key"];
+export function sortResorts(resorts: readonly Resort[], key: SortKey): Resort[] {
+  const value = (resort: Resort) => key === "openingOrder" || key === "snowTotalIn" ? resort.season[key] : metricValue(resort, key);
   return [...resorts].sort((a, b) => {
     const left = value(a), right = value(b);
     if (!isValidMetric(left)) return isValidMetric(right) ? 1 : 0;
     if (!isValidMetric(right)) return -1;
-    return (left - right) * (higherIsBetter ? -1 : 1);
+    return (left - right) * (key === "openingOrder" ? 1 : -1);
   });
+}
+
+export function formatTerrainParks(parks: TerrainParks): string {
+  return parks.count !== undefined ? String(parks.count) : `${parks.min}–${parks.max}`;
 }
