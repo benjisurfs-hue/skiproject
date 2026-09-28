@@ -2,17 +2,10 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { resorts, type Resort } from "./resorts";
+import { resorts } from "../data/resorts";
+import type { Resort } from "../data/resort";
+import { getComparisons, sortOptions, sortResorts } from "../lib/comparisons";
 
-const sortOptions = [
-  { key: "openingOrder", label: "Projected Opening Date", short: "Opening Date", direction: 1 },
-  { key: "snowTotal", label: "2025/26 Snow Totals", short: "Snow Totals", direction: -1 },
-  { key: "snowfall", label: "Snowfall", short: "Snowfall", direction: -1 },
-  { key: "acres", label: "Mountain size", short: "Mountain size", direction: -1 },
-  { key: "vertical", label: "Vertical", short: "Vertical", direction: -1 },
-  { key: "wait", label: "Lift access", short: "Lift access", direction: 1 },
-  { key: "price", label: "Affordability", short: "Affordability", direction: 1 },
-] as const;
 const upcomingStates = ["New York", "New Hampshire", "Massachusetts", "Maine", "Connecticut", "New Jersey", "Pennsylvania"];
 const asset = (node: string, name: string, extension = "svg") => `/figma/${node.replace(":", "-")}-${name}.${extension}`;
 
@@ -31,8 +24,8 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
           gallery.current?.scrollBy({ left: (event.key === "ArrowRight" ? 1 : -1) * (gallery.current.clientWidth - 25), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
         }
       }}>
-      {[1, 2, 3].map((photo) => <div className="photo" key={photo}>
-        <Image src={asset(resort.figmaNode, `imgMedia${photo}`, "png")} alt={`${resort.name} — ${["mountain and ski trails", "resort experience", "mountain experience"][photo - 1]}`} fill sizes="(max-width: 767px) 90vw, 380px" priority={priority && photo === 1} />
+      {resort.media.map((media, index) => <div className="photo" key={media.src}>
+        {media.kind === "video" ? <video controls preload="metadata" poster={media.poster} aria-label={media.alt}><source src={media.src} /></video> : <Image src={media.src} alt={media.alt} fill sizes="(max-width: 767px) 90vw, 380px" priority={priority && index === 0} />}
       </div>)}
     </div>
     <div className="card-content">
@@ -43,11 +36,11 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
           <span className="character"><Icon node={resort.figmaNode} name="imgPeopleOutline" size={16} />{resort.character}</span>
         </div>
         <dl className="headline-facts">
-          <div><dt>Projected Opening Date</dt><dd>{resort.opening}</dd></div>
-          <div><dt>2025/26 Snow Totals</dt><dd>{resort.snowTotal}&quot;</dd></div>
+          <div><dt>Projected Opening Date</dt><dd>{resort.season.projectedOpening}</dd></div>
+          <div><dt>{resort.season.label} Snow Totals</dt><dd>{resort.season.snowTotalIn}&quot;</dd></div>
         </dl>
-        <ul className="highlights">{resort.highlights.map((highlight, index) => <li key={highlight}>
-          <Icon node={resort.figmaNode} name={["imgNounSnowflake75393611", "imgFrame32", "imgNounSnowflake75393612"][index]} size={60} /><span>{highlight}</span>
+        <ul className="highlights">{resort.highlights.map((highlight) => <li key={highlight.text}>
+          <Image src={highlight.iconSrc} width={60} height={60} alt="" unoptimized /><span>{highlight.text}</span>
         </li>)}</ul>
         <p className="description">{resort.description}</p>
         <div className="pros-cons">{(["pros", "cons"] as const).map((kind) => <section key={kind} aria-label={`${resort.name} ${kind}`}>
@@ -55,12 +48,12 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
         </section>)}</div>
       </div>
       <section className="comparisons" aria-label={`${resort.name} comparison`}>
-        <h3>How It Compares</h3><p className="comparison-subtitle">Against Northeast resorts</p>
-        <dl className="comparison-list">{resort.comparisons.map((stat) => <div className="comparison" key={stat.label}>
-          <dt>{stat.label}</dt><dd><span className="bar" aria-hidden="true"><span style={{ width: `${stat.fraction * 100}%` }} /></span><span className="comparison-value">{stat.value}</span></dd>
+        <h3>How It Compares</h3><p className="comparison-subtitle">Against local sample resorts</p>
+        <dl className="comparison-list">{getComparisons(resort, resorts).map((stat) => <div className="comparison" key={stat.label}>
+          <dt>{stat.label}</dt><dd><span className="bar" role="meter" aria-label={`${stat.label}: ${stat.value}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={stat.score ?? undefined} aria-valuetext={stat.score === null ? "Not available" : `${stat.score} out of 100 within the local sample; more fill is better`} title={stat.score === null ? "Not available" : `${stat.score}/100 — local sample comparison; more fill is better`}><span style={{ width: `${stat.score ?? 0}%` }} /></span><span className="comparison-value">{stat.value}</span></dd>
         </div>)}</dl>
         <section className="terrain" aria-label={`${resort.name} terrain`}>
-          <h3>Terrain</h3><dl>{resort.terrain.map((item, index) => <div key={item.label}>
+          <h3>Terrain</h3><dl>{[{ label: "Green runs (Beginner)", count: resort.trailCounts.beginner }, { label: "Blue runs (Intermediate)", count: resort.trailCounts.intermediate }, { label: "Black runs (Advanced)", count: resort.trailCounts.advanced }, { label: "Terrain Parks", count: resort.terrainParks }].map((item, index) => <div key={item.label}>
             <dt><span className="terrain-icon">{index === 0 || index === 3 ? <Icon node={resort.figmaNode} name={index === 0 ? "imgFrame46" : "imgFrame49"} size={16} /> : <span className={index === 1 ? "blue-run" : "black-run"} />}</span>{item.label}</dt><dd>{item.count}</dd>
           </div>)}</dl>
         </section>
@@ -79,7 +72,7 @@ export default function ResortExplorer() {
   const panelHeading = useRef<HTMLHeadingElement>(null);
   const previousScroll = useRef(0);
   const selectedSort = sortOptions[sortIndex ?? 0];
-  const sortedResorts = sortIndex === null ? resorts : [...resorts].sort((a, b) => (a[selectedSort.key] - b[selectedSort.key]) * selectedSort.direction);
+  const sortedResorts = sortIndex === null ? resorts : sortResorts(resorts, selectedSort.key);
   function openScreen(next: "sort" | "states") {
     if (screen === "results") previousScroll.current = window.scrollY;
     setScreen(next); window.scrollTo(0, 0);
