@@ -5,6 +5,19 @@ export type ResortMedia = { kind: "image"; role: "resort"; src: string; alt: str
 export type TerrainParks = { status: "seasonal" } & (
   { count: number; min?: never; max?: never } | { count?: never; min: number; max: number }
 );
+export type TransitOption = {
+  type: "bus" | "train" | "shuttle";
+  provider: string;
+  label: string;
+  url: string;
+  station?: string;
+  connection?: string;
+  note?: string;
+};
+export type NycTransportation = {
+  driveTime: string | null;
+  transitOptions: TransitOption[];
+};
 export type Resort = {
   id: string;
   slug: string;
@@ -16,6 +29,7 @@ export type Resort = {
   passes: Pass[];
   tier: string | null;
   character: string | null;
+  nycTransportation: NycTransportation;
   media: ResortMedia[];
   annualSnowfallIn: number | null;
   skiableAcres: number | null;

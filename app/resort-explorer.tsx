@@ -7,7 +7,8 @@ import type { Resort } from "../data/resort";
 import { formatNumber, formatTerrainParks, getComparisons, sortOptions, sortResorts } from "../lib/comparisons";
 
 import { filterResorts, passFilters, type PassFilter } from "../lib/filters";
-
+import Link from "next/link";
+import ResortMetadata from "./resort-metadata";
 const asset = (node: string, name: string, extension = "svg") => `/figma/${node.replace(":", "-")}-${name}.${extension}`;
 
 function Icon({ node, name, size }: { node: string; name: string; size: number }) {
@@ -16,9 +17,8 @@ function Icon({ node, name, size }: { node: string; name: string; size: number }
 
 function ResortCard({ resort, priority }: { resort: Resort; priority: boolean }) {
   const gallery = useRef<HTMLDivElement>(null);
-  const iconNode = resort.figmaNode ?? "205:10024";
   return <article className="resort-card" aria-labelledby={`${resort.id}-title`} data-figma-node={resort.figmaNode ?? undefined} data-resort-id={resort.id}>
-    <header className="resort-heading"><p>{resort.region}</p><h2 id={`${resort.id}-title`}>{resort.name}</h2></header>
+    <header className="resort-detail-header resort-heading"><p>{resort.region}</p><h2 id={`${resort.id}-title`}>{resort.name}</h2></header>
     <div className="photo-gallery" ref={gallery} role="region" aria-label={`${resort.name} photos. Use left and right arrow keys to browse.`} tabIndex={0}
       onKeyDown={(event) => {
         if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
@@ -32,11 +32,7 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
     </div>
     <div className="card-content">
       <div className="overview">
-        <div className="tags">
-          {resort.passes.length ? resort.passes.map(pass => <span key={pass} className={`tag pass-${pass.toLowerCase()}`}>{pass}</span>) : <span className="tag">Not on multi-pass</span>}
-          {resort.tier && <span className={`tag tier-${resort.tier.toLowerCase()}`}>{resort.tier}</span>}
-          {resort.character && <span className="character"><Icon node={iconNode} name="imgPeopleOutline" size={16} />{resort.character}</span>}
-        </div>
+        <ResortMetadata resort={resort} />
         <dl className="headline-facts">
           <div><dt>Projected Opening Date</dt><dd>{resort.season.projectedOpening ?? "Not available"}</dd></div>
           <div><dt>{resort.season.label} Snow Totals</dt><dd>{resort.season.snowTotalIn === null ? "Not available" : `${resort.season.snowTotalIn}″`}</dd></div>
@@ -45,29 +41,36 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
         <ul className="highlights">{resort.highlights.map((highlight) => <li key={highlight.text}>
           <Image src={highlight.iconSrc} width={60} height={60} alt="" unoptimized /><span>{highlight.text}</span>
         </li>)}{Array.from({ length: Math.max(0, 3 - resort.highlights.length) }, (_, index) => <li className="pending-highlight" key={`pending-${index}`}>Highlight pending</li>)}</ul>
-        <p className="description">{resort.description ?? "Description not yet available."}</p>
-        <div className="pros-cons">{(["pros", "cons"] as const).map((kind) => <section key={kind} aria-label={`${resort.name} ${kind}`}>
-          <h3>{kind === "pros" ? "Pros" : "Cons"}</h3><ul>{resort[kind].map((item) => <li key={item}>{item}</li>)}{resort[kind].length < (kind === "pros" ? 4 : 3) && <li className="data-note">{(kind === "pros" ? 4 : 3) - resort[kind].length} {kind} pending</li>}</ul>
-        </section>)}</div>
-      </div>
-      <section className="comparisons" aria-label={`${resort.name} comparison`}>
-        <h3>How It Compares</h3><p className="comparison-subtitle">Across 16 Vermont resorts</p>
-        <dl className="comparison-list">{getComparisons(resort, resorts).map((stat) => <div className="comparison" key={stat.label}>
-          <dt>{stat.label}</dt><dd><span className="bar" role={stat.score === null ? undefined : "meter"} aria-label={`${stat.label}: ${stat.value}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={stat.score ?? undefined} aria-valuetext={stat.score === null ? "Not available" : `${Math.round(stat.score)} out of 100; more fill is better${stat.prototype ? "; prototype rating" : "; Vermont V1 comparison"}`} title={stat.score === null ? "Not available" : `${Math.round(stat.score)}/100 — ${stat.prototype ? "prototype rating" : "Vermont V1 comparison"}; more fill is better`}><span style={{ width: `${stat.score ?? 0}%` }} /></span><span className="comparison-value">{stat.value}{stat.detail && <small>{stat.detail}</small>}</span></dd>
-        </div>)}</dl>
-        <p className="data-note">Lift Access &amp; Affordability are prototype ratings, not live waits or prices.</p>
-        <section className="terrain" aria-label={`${resort.name} terrain`}>
-          <h3>Terrain</h3><dl>{[{ label: "Green runs (Beginner)", count: resort.terrain ? `${formatNumber(resort.terrain.beginner)}%` : "Not available" }, { label: "Blue runs (Intermediate)", count: resort.terrain ? `${formatNumber(resort.terrain.intermediate)}%` : "Not available" }, { label: "Black runs (Advanced)", count: resort.terrain ? `${formatNumber(resort.terrain.advanced)}%` : "Not available" }, { label: "Terrain Parks (seasonal)", count: formatTerrainParks(resort.terrainParks) }].map((item, index) => <div key={item.label}>
-            <dt><span className="terrain-icon">{index === 0 || index === 3 ? <Icon node={iconNode} name={index === 0 ? "imgFrame46" : "imgFrame49"} size={16} /> : <span className={index === 1 ? "blue-run" : "black-run"} />}</span>{item.label}</dt><dd>{item.count}</dd>
-          </div>)}</dl>
-        </section>
-      </section>
-      <section className="mountain-stats" aria-label={`${resort.name} mountain statistics`}>
-        <h3>Mountain Stats</h3>
-        <dl>{([{ label: "Trails", value: resort.trailCount }, { label: "Lifts", value: resort.liftCount }, { label: "Summit elevation", value: resort.summitElevationFt, unit: " ft" }, { label: "Base elevation", value: resort.baseElevationFt, unit: " ft" }]).map(stat => <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value === null ? "Not available" : `${formatNumber(stat.value)}${stat.unit ?? ""}`}</dd></div>)}</dl>
-      </section>
-      <a className="resort-link" href={resort.website} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${resort.name} website (opens in a new tab)`}>Visit resort website</a>
-    </div>
+<p className="description">
+  {resort.description ?? "Description not yet available."}
+</p>
+
+<div className="pros-cons">
+  <section aria-label={`${resort.name} pros`}>
+    <ul>
+      {resort.pros.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  </section>
+
+  <section aria-label={`${resort.name} cons`}>
+    <ul>
+      {resort.cons.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  </section>
+</div>
+
+</div>
+     
+<Link
+  className="resort-link"
+  href={`/resorts/${resort.id}`}
+>
+  View resort
+</Link>    </div>
   </article>;
 }
 
@@ -101,6 +104,32 @@ export default function ResortExplorer() {
       window.visualViewport?.removeEventListener("resize", update);
     };
   }, []);
+  useEffect(() => {
+  const headers = document.querySelectorAll<HTMLElement>(".resort-heading");
+
+  const update = () => {
+    headers.forEach((header) => {
+      const card = header.closest<HTMLElement>(".resort-card");
+      if (!card) return;
+
+      const headerRect = header.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+
+      const stickyTop = parseFloat(getComputedStyle(header).top) || 0;
+
+      const isStuck =
+        headerRect.top <= stickyTop &&
+        cardRect.bottom > stickyTop + header.offsetHeight;
+
+      header.classList.toggle("is-stuck", isStuck);
+    });
+  };
+
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+
+  return () => window.removeEventListener("scroll", update);
+}, []);
   function openMenu() {
     previousScroll.current = window.scrollY;
     if (navigation.current) navigation.current.open = true;
