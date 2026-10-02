@@ -1,7 +1,7 @@
 import { parse } from "csv-parse/sync";
 import type { Pass, PrototypeScore, Resort, TerrainParks } from "../data/resort";
 
-export const sheetColumns = "id,slug,name,state,region,latitude,longitude,passes,tier,character,annualSnowfallIn,skiableAcres,verticalFt,trailCount,liftCount,summitElevationFt,baseElevationFt,liftAccessScore,liftAccessLabel,affordabilityScore,affordabilityLabel,priceBand,projectedOpening,beginner,intermediate,advanced,terrainParks,description,website,nycDriveTime,nycBusAvailable,lastVerified,published".split(",");
+export const sheetColumns = "id,slug,name,state,region,latitude,longitude,passes,tier,character,annualSnowfallIn,skiableAcres,verticalFt,trailCount,liftCount,summitElevationFt,baseElevationFt,liftAccessScore,liftAccessLabel,affordabilityScore,affordabilityLabel,priceBand,projectedOpening,beginner,intermediate,advanced,terrainParks,description,highlight1,highlight1Icon,highlight2,highlight2Icon,highlight3,highlight3Icon,website,nycDriveTime,nycBusAvailable,lastVerified,published".split(",");
 
 function number(value: string, field: string, min = 0, max = Infinity): number | null {
   if (!value.trim()) return null;
@@ -153,6 +153,15 @@ const r: Resort = structuredClone(base);
     else if (beginner === null || intermediate === null || advanced === null) throw new Error("Complete all three terrain percentages, or leave all blank");
     else r.terrain = { beginner, intermediate, advanced };
     r.terrainParks = parks(row.terrainParks, base.terrainParks);
+    const sheetHighlights = [
+  { text: row.highlight1, iconSrc: row.highlight1Icon },
+  { text: row.highlight2, iconSrc: row.highlight2Icon },
+  { text: row.highlight3, iconSrc: row.highlight3Icon },
+].filter(highlight => highlight.text.trim() && highlight.iconSrc.trim());
+
+if (sheetHighlights.length > 0) {
+  r.highlights = sheetHighlights;
+}
     if (row.website && !["http:", "https:"].includes(new URL(row.website).protocol)) throw new Error("Invalid website URL");
     r.website = row.website;
     r.nycTransportation.driveTime = row.nycDriveTime || null;
