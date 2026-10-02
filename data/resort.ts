@@ -23,7 +23,7 @@ export type Resort = {
   id: string;
   slug: string;
   name: string;
-  state: "Vermont";
+  state: string;
   region: string;
   coordinates: { latitude: number; longitude: number } | null;
   figmaNode: string | null;
