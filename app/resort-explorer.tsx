@@ -36,6 +36,7 @@ function Icon({ node, name, size }: { node: string; name: string; size: number }
 
 function formatOpeningDate(date: string | null | undefined) {
   if (!date) return "To be announced";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
 
   return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
     month: "long",
@@ -125,6 +126,9 @@ export default function ResortExplorer({ resorts }: { resorts: Resort[] }) {
   const states = [...new Set(resorts.map(resort => resort.state))].sort();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigation = useRef<HTMLDetailsElement>(null);
+  const menuSheet = useRef<HTMLDivElement>(null);
+  const menuAnimation = useRef<Animation | null>(null);
+  const closingMenu = useRef(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const progressWidth = 2 + scrollProgress * 98;
 
@@ -221,38 +225,98 @@ const visibleResorts = sortResorts(
 
   return () => window.removeEventListener("scroll", update);
 }, [menuOpen, sortIndex, selectedPasses, selectedStates]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [menuOpen]);
+  useEffect(() => () => menuAnimation.current?.cancel(), []);
+
+  function animateMenu(open: boolean, finished: () => void) {
+    const sheet = menuSheet.current;
+    if (!sheet) return finished();
+    const from = new DOMMatrixReadOnly(getComputedStyle(sheet).transform).m42;
+    menuAnimation.current?.cancel();
+    const to = open ? 0 : -sheet.offsetHeight;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      sheet.style.transform = `translateY(${to}px)`;
+      finished();
+      return;
+    }
+    // Prototype 624:23386 / 626:2691: downward Gentle, upward Slow.
+    // Durations are exported verbatim. The API exposes preset names only;
+    // these sampled physical springs approximate their settling behavior.
+    const duration = open ? 1022.0937728881836 : 1250.1229047775269;
+    const frames = Array.from({ length: 121 }, (_, index) => {
+      const offset = index / 120;
+      const t = offset * duration / 1000;
+      const progress = index === 120 ? 1 : open
+        ? 1 - Math.exp(-7.5 * t) * (Math.cos(Math.sqrt(43.75) * t) + 7.5 / Math.sqrt(43.75) * Math.sin(Math.sqrt(43.75) * t))
+        : 1 - (1 + 10 * t) * Math.exp(-10 * t);
+      return { offset, transform: `translateY(${from + (to - from) * progress}px)` };
+    });
+    const animation = sheet.animate(frames, { duration, easing: "linear", fill: "forwards" });
+    menuAnimation.current = animation;
+    animation.onfinish = () => {
+      if (menuAnimation.current !== animation) return;
+      sheet.style.transform = `translateY(${to}px)`;
+      animation.cancel();
+      menuAnimation.current = null;
+      finished();
+    };
+  }
   function openMenu() {
     previousScroll.current = window.scrollY;
     if (navigation.current) navigation.current.open = true;
   }
   function back() {
-    if (navigation.current) navigation.current.open = false;
+    if (!navigation.current?.open || closingMenu.current) return;
+    closingMenu.current = true;
+    animateMenu(false, () => {
+      if (navigation.current) navigation.current.open = false;
+    });
   }
   function handleNavigationToggle(event: React.SyntheticEvent<HTMLDetailsElement>) {
     const open = event.currentTarget.open;
     setMenuOpen(open);
-    requestAnimationFrame(() => {
-      if (navigation.current?.open !== open) return;
-      if (open) {
-        window.scrollTo(0, 0);
-        panelHeading.current?.focus({ preventScroll: true });
-      } else {
-        sortTrigger.current?.focus({ preventScroll: true });
-        window.scrollTo(0, previousScroll.current);
-      }
-    });
+    if (open) {
+      closingMenu.current = false;
+      const sheet = menuSheet.current;
+      if (sheet) sheet.style.transform = "translateY(-100%)";
+      const panel = sheet?.querySelector<HTMLElement>(".selection-panel");
+      if (panel) panel.scrollTop = 0;
+      animateMenu(true, () => {});
+      panelHeading.current?.focus({ preventScroll: true });
+    } else {
+      closingMenu.current = false;
+      sortTrigger.current?.focus({ preventScroll: true });
+      window.scrollTo(0, previousScroll.current);
+    }
+  }
+  function keepFocusInMenu(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Tab") return;
+    const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(
+      'input[type="radio"]:checked, input[type="checkbox"], button'
+    ));
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === panelHeading.current)) {
+      event.preventDefault(); last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault(); first?.focus();
+    }
   }
   function backToTop() {
     window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   }
   function revealFocusedOption(event: React.FocusEvent<HTMLElement>) {
     const option = event.target.closest<HTMLElement>(".sort-option, .filter-option");
-    const toolbar = sortTrigger.current;
-    const returnBar = event.currentTarget.querySelector<HTMLElement>(".menu-bottom");
-    if (!option || !toolbar || !returnBar) return;
+    const panel = event.currentTarget;
+    if (!option) return;
     const bounds = option.getBoundingClientRect();
-    if (bounds.top < toolbar.getBoundingClientRect().bottom + 8 ||
-        bounds.bottom > returnBar.getBoundingClientRect().top - 8) {
+    if (bounds.top < panel.getBoundingClientRect().top + 8 ||
+        bounds.bottom > panel.getBoundingClientRect().bottom - 8) {
       option.scrollIntoView({ block: "nearest", behavior: "instant" });
     }
   }
@@ -266,7 +330,7 @@ const visibleResorts = sortResorts(
   }
   const backButton = <button type="button" onClick={back}><Icon node="217:12197" name="imgIconChevronLeft" size={24} /><span>Back To Results</span></button>;
   return <div className="site-shell" onKeyDown={(event) => { if (event.key === "Escape" && navigation.current?.open) back(); }}>
-    <a href="#main" className="skip-link">Skip to resorts</a>
+    <a href="#main" className="skip-link" tabIndex={menuOpen ? -1 : undefined} aria-hidden={menuOpen || undefined}>Skip to resorts</a>
     <details className="filter-navigation" ref={navigation} onToggle={handleNavigationToggle}>
       <summary
   className="toolbar"
@@ -276,6 +340,8 @@ const visibleResorts = sortResorts(
       previousScroll.current = window.scrollY;
     }
   }}
+  tabIndex={menuOpen ? -1 : 0}
+  aria-hidden={menuOpen || undefined}
   aria-controls="filter-sort-panel"
 >
   <div
@@ -291,7 +357,8 @@ style={{ width: `${progressWidth}%` }}  />
   </span>
 
 </summary>
-      <section id="filter-sort-panel" className="selection-panel" data-figma-node="624:23204" aria-label="Filter and sort resorts" onFocus={revealFocusedOption}>
+      <div className="filter-sheet" ref={menuSheet} role="dialog" aria-modal="true" aria-label="Filter and sort resorts" onKeyDown={keepFocusInMenu}>
+      <section id="filter-sort-panel" className="selection-panel" data-figma-node="626:2499" aria-label="Filter and sort resorts" onFocus={revealFocusedOption}>
         <div className="sort-section">
           <h1 ref={panelHeading} tabIndex={-1}>Sort Resorts By:</h1>
           <div className="options sort-options" role="radiogroup" aria-label="Sort resorts">
@@ -354,10 +421,11 @@ const SortIcon = sortIcons[option.icon];
     ))}
   </div>
         </div>
-        <div className="menu-bottom toolbar">{backButton}</div>
       </section>
+      <div className="menu-bottom toolbar">{backButton}</div>
+      </div>
     </details>
-    <main id="main">
+    <main id="main" inert={menuOpen}>
       <h1 className="sr-only">Vermont ski resorts</h1>
       <p className="sr-only" aria-live="polite">{visibleResorts.length} resorts sorted by {selectedSort.label}</p>
       <div className="resort-list">{visibleResorts.map((resort, index) => <ResortCard key={resort.id} resort={resort} priority={index === 0} />)}</div>

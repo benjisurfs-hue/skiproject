@@ -113,8 +113,7 @@ footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
 .mountain-stats h2, .mountain-stats h3 { font-size: 16px; line-height: 20px; font-weight: 700; margin-bottom: 8px; }
 .mountain-stats dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 12px; line-height: 16px; }
 .mountain-stats dd { font-weight: 700; }
-.site-shell:has(.filter-navigation[open]) { max-width: 402px; padding-inline: 0; }
-.filter-navigation[open] { position: relative; padding-top: var(--toolbar-height); }
+.filter-navigation[open] { position: static; }
 .filter-navigation[open] > .toolbar { position: fixed; }
 .selection-panel { padding: 10px 0 calc(var(--toolbar-height) + env(safe-area-inset-bottom, 0px)); }
 .sort-section { padding: 10px 10px 24px; border-bottom: 1px solid var(--border); }
@@ -155,7 +154,7 @@ footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
 .filter-navigation > summary::marker { content: ""; }
 .toolbar-control { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 5px 12px; border-radius: 12px; font-size: 10px; line-height: 12px; font-weight: 700; }
 .toolbar-control > * { pointer-events: none; }
-.filter-navigation[open] ~ main, .filter-navigation[open] ~ .back-to-top { display: none; }
+.filter-navigation[open] ~ .back-to-top { display: none; }
 .toolbar button { min-height: 44px; touch-action: manipulation; }
 .menu-bottom { top: auto; }
 .skip-link:focus { z-index: 1001; }
@@ -363,4 +362,50 @@ body {
   padding: 12px 16px;
   border-radius: 0;
   background: transparent;
+}
+/* Page 4 prototype: a full-height sheet slides down over the results. */
+.filter-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  height: 100dvh;
+  background: white;
+  transform: translateY(-100%);
+  overflow: hidden;
+}
+.filter-sheet .selection-panel {
+  width: 100%;
+  max-width: 402px;
+  height: calc(100% - var(--toolbar-height) - env(safe-area-inset-bottom, 0px));
+  min-height: 0;
+  margin-inline: auto;
+  padding: 10px 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 12px;
+}
+.filter-sheet .sort-option, .filter-sheet .filter-option { scroll-margin-block: 8px; }
+.filter-sheet .menu-bottom {
+  position: absolute;
+  max-width: none;
+  padding: 0 0 env(safe-area-inset-bottom, 0px);
+  border: 0;
+  background: #1368b3;
+  color: white;
+  box-shadow: 0 -6px 4px rgb(0 0 0 / 25%);
+}
+.filter-sheet .menu-bottom button {
+  width: 100%;
+  max-width: 402px;
+  height: var(--toolbar-height);
+  margin-inline: auto;
+  border-radius: 0;
+  padding: 12px 16px;
+}
+.filter-sheet .menu-bottom img { filter: brightness(0) invert(1); }
+@media (hover: hover) and (pointer: fine) {
+  .filter-sheet .menu-bottom button:hover { background: rgb(255 255 255 / 10%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .filter-sheet { scroll-behavior: auto; }
 }
