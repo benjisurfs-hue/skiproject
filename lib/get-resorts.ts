@@ -7,10 +7,10 @@ const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=
 
 export async function getResorts() {
   try {
-    const response = await fetch(sheetUrl, {
-      next: { revalidate: 300 },
-      signal: AbortSignal.timeout(8000),
-    });
+const response = await fetch(sheetUrl, {
+  cache: "no-store",
+  signal: AbortSignal.timeout(8000),
+});
     if (!response.ok) throw new Error(`Sheet returned HTTP ${response.status}`);
     return mergeResortSheet(await response.text(), resorts);
   } catch (error) {

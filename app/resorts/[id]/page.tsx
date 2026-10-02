@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import ResortGallery from "../../resort-gallery";
 import ResortMetadata from "../../resort-metadata";
 import { getResorts } from "../../../lib/get-resorts";
-export const revalidate = 300;
 import {
   formatNumber,
   formatTerrainParks,
