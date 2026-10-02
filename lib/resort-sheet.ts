@@ -1,7 +1,7 @@
 import { parse } from "csv-parse/sync";
 import type { Pass, PrototypeScore, Resort, TerrainParks } from "../data/resort";
 
-export const sheetColumns = "id,slug,name,state,region,latitude,longitude,passes,tier,character,annualSnowfallIn,skiableAcres,verticalFt,trailCount,liftCount,summitElevationFt,baseElevationFt,liftAccessScore,liftAccessLabel,affordabilityScore,affordabilityLabel,priceBand,projectedOpening,beginner,intermediate,advanced,terrainParks,description,highlight1,highlight1Icon,highlight2,highlight2Icon,highlight3,highlight3Icon,photo1,photo2,photo3,website,nycDriveTime,nycBusAvailable,lastVerified,published".split(",");
+export const sheetColumns = "id,slug,name,state,region,latitude,longitude,passes,tier,character,annualSnowfallIn,skiableAcres,verticalFt,trailCount,liftCount,summitElevationFt,baseElevationFt,liftAccessScore,liftAccessLabel,affordabilityScore,affordabilityLabel,priceBand,projectedOpening,beginner,intermediate,advanced,terrainParks,description,highlight1,highlight1Icon,highlight2,highlight2Icon,highlight3,highlight3Icon,photo1,photo2,photo3,pro1,pro2,pro3,con1,con2,con3,website,nycDriveTime,nycBusAvailable,lastVerified,published".split(",");
 
 function number(value: string, field: string, min = 0, max = Infinity): number | null {
   if (!value.trim()) return null;
@@ -174,11 +174,39 @@ if (sheetPhotos.length > 0) {
     alt: `${r.name} ski area${index === 0 ? "" : ` photo ${index + 1}`}`,
   }));
 }
-if (sheetHighlights.length > 0) {
-  r.highlights = sheetHighlights;
+
+const sheetPros = [
+  row.pro1,
+  row.pro2,
+  row.pro3,
+]
+  .map(item => item.trim())
+  .filter(Boolean);
+
+const sheetCons = [
+  row.con1,
+  row.con2,
+  row.con3,
+]
+  .map(item => item.trim())
+  .filter(Boolean);
+
+if (sheetPros.length > 0) {
+  r.pros = sheetPros;
 }
-    if (row.website && !["http:", "https:"].includes(new URL(row.website).protocol)) throw new Error("Invalid website URL");
-    r.website = row.website;
+
+if (sheetCons.length > 0) {
+  r.cons = sheetCons;
+}
+
+if (
+  row.website &&
+  !["http:", "https:"].includes(new URL(row.website).protocol)
+) {
+  throw new Error("Invalid website URL");
+}
+
+r.website = row.website;
     r.nycTransportation.driveTime = row.nycDriveTime || null;
     const hours = row.nycDriveTime.match(/^~?\s*(\d+(?:\.\d+)?)\s*hours?\s*$/i);
     r.nycTransportation.driveTimeHours = hours ? Number(hours[1]) : null;
