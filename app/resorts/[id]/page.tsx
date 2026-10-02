@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ResortGallery from "../../resort-gallery";
 import ResortMetadata from "../../resort-metadata";
-import { resorts } from "../../../data/resorts";
+import { getResorts } from "../../../lib/get-resorts";
+export const revalidate = 300;
 import {
   formatNumber,
   formatTerrainParks,
@@ -16,6 +17,7 @@ type ResortPageProps = {
 };
 export default async function ResortPage({ params }: ResortPageProps) {
   const { id } = await params;
+  const resorts = await getResorts();
   const resort = resorts.find((resort) => resort.id === id);
   if (!resort) {
     notFound();
@@ -108,9 +110,9 @@ export default async function ResortPage({ params }: ResortPageProps) {
                     </span>
 
 <span className="comparison-value">
-  {stat.prototype ? stat.label === "Lift Access"
+  {stat.prototype ? stat.key === "liftAccess"
     ? resort.liftAccess.label
-    : stat.label === "Affordability"
+    : stat.key === "affordability"
       ? resort.affordability.label
       : stat.value
     : stat.value}
