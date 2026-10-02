@@ -15,6 +15,7 @@ export type TransitOption = {
   note?: string;
 };
 export type NycTransportation = {
+  busAvailable?: boolean;
   driveTime: string | null;
   driveTimeHours: number | null;
   transitOptions: TransitOption[];

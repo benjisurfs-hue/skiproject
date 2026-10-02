@@ -32,6 +32,9 @@ export default function ResortMetadata({ resort }: { resort: MetadataResort }) {
     ><Car size={16} strokeWidth={1.5} aria-hidden="true" /><span>NYC{driveTime}</span></button>}
     {transitTypes.map(type => {
       const options = transitOptions.filter(option => option.type === type);
+      if (type === "bus" && resort.nycTransportation.busAvailable === true && !options.length) {
+        return <span key={type} className="transportation-button"><Bus size={16} strokeWidth={1.5} aria-hidden="true" />Bus</span>;
+      }
       if (!options.length) return null;
       const { label, title, icon: Icon } = transitPresentation[type];
       return <button key={type} type="button" className="transportation-button" aria-haspopup="dialog"

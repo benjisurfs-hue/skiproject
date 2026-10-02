@@ -14,7 +14,6 @@ import {
   MoveUp,
 } from "lucide-react";
 
-import { resorts } from "../data/resorts";
 import type { Resort } from "../data/resort";
 
 import {
@@ -122,9 +121,8 @@ const sortIcons = {
   "cable-car": CableCar,
   "badge-dollar-sign": BadgeDollarSign,
 };
-const states = [...new Set(resorts.map(resort => resort.state))].sort();
-
-export default function ResortExplorer() {
+export default function ResortExplorer({ resorts }: { resorts: Resort[] }) {
+  const states = [...new Set(resorts.map(resort => resort.state))].sort();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigation = useRef<HTMLDetailsElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
