@@ -19,11 +19,19 @@ export default function ResortMetadata({ resort }: { resort: MetadataResort }) {
   const transitTypes = Object.keys(transitPresentation) as TransitOption["type"][];
 
   return <div className="tags resort-metadata">
-    {resort.passes.length ? resort.passes.map(pass => <button
-      key={pass} type="button" className={`tag metadata-pass pass-${pass.toLowerCase()}`}
-      aria-haspopup="dialog" aria-label={`${pass} Pass information for ${resort.name}`}
-      onClick={(event) => { event.stopPropagation(); openInfo({ kind: "pass", pass }, event.currentTarget); }}
-    >{pass} Pass</button>) : <span className="no-multipass">Multi-pass</span>}
+    {resort.passes.map(pass => <button
+  key={pass}
+  type="button"
+  className={`tag metadata-pass pass-${pass.toLowerCase()}`}
+  aria-haspopup="dialog"
+  aria-label={`${pass} Pass information for ${resort.name}`}
+  onClick={(event) => {
+    event.stopPropagation();
+    openInfo({ kind: "pass", pass }, event.currentTarget);
+  }}
+>
+  {pass} Pass
+</button>)}
     {resort.tier && <span className={`tag tier-${resort.tier.toLowerCase()}`}>{resort.tier}</span>}
     {driveTime && <button
       type="button" className="transportation-button" aria-haspopup="dialog"

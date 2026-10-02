@@ -104,7 +104,6 @@ footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
 .tags { flex-wrap: wrap; }
 .pass-epic { background: #e3e6f1; }
 .headline-facts { height: auto; }
-.pending-highlight { min-height: 96px; color: #70757c; font-weight: 400 !important; justify-content: center !important; }
 .data-note { font-size: 11px; line-height: 16px; margin-top: 4px; }
 .comparison { height: auto; min-height: 40px; }
 .comparison-value { flex-basis: 136px; white-space: normal; }
@@ -408,4 +407,15 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .filter-sheet { scroll-behavior: auto; }
+}
+
+.photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f5f6;
+  color: #70757c;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
 }

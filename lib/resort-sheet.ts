@@ -41,6 +41,75 @@ function parks(value: string, fallback: TerrainParks): TerrainParks {
   throw new Error("Invalid terrain parks count or range");
 }
 
+function createBlankResort(id: string): Resort {
+  return {
+    id,
+    slug: id,
+    name: id,
+    state: "",
+    region: "",
+    coordinates: null,
+    figmaNode: null,
+    passes: [],
+    tier: null,
+    character: null,
+
+    nycTransportation: {
+      driveTime: null,
+      driveTimeHours: null,
+      transitOptions: [],
+    },
+
+    media: [],
+
+    annualSnowfallIn: null,
+    skiableAcres: null,
+    verticalFt: null,
+    trailCount: null,
+    liftCount: null,
+    summitElevationFt: null,
+    baseElevationFt: null,
+
+    liftAccess: {
+      score: 3,
+      label: "",
+      status: "prototype",
+    },
+
+    affordability: {
+      score: 3,
+      label: "",
+      priceBand: "",
+      status: "prototype",
+    },
+
+    season: {
+      label: "",
+      snowTotalIn: null,
+      projectedOpening: null,
+      openingOrder: null,
+      status: "unavailable",
+    },
+
+    terrain: null,
+
+    terrainParks: {
+      status: "seasonal",
+      count: 0,
+    },
+
+    description: null,
+
+    highlights: [],
+    pros: [],
+    cons: [],
+
+    website: "",
+    sources: [],
+    lastVerified: null,
+  };
+}
+
 /** Join on stable IDs. The sheet owns rows; local files supply photos and editorial fields. */
 export function mergeResortSheet(csv: string, originals: readonly Resort[]): Resort[] {
   const table: string[][] = parse(csv, { bom: true, skip_empty_lines: true });
@@ -55,9 +124,8 @@ export function mergeResortSheet(csv: string, originals: readonly Resort[]): Res
     if (!id || seen.has(id)) throw new Error("Missing or duplicate resort ID");
     seen.add(id);
     if (flag(row.published) === false) return [];
-    const base = originals.find(r => r.id === id);
-    if (!base) throw new Error(`Add a local resort record for ${id} before publishing it`);
-    const r: Resort = structuredClone(base);
+const base = originals.find(r => r.id === id) ?? createBlankResort(id);
+const r: Resort = structuredClone(base);
     for (const key of ["slug", "name", "state", "region"] as const) {
       if (!row[key].trim()) throw new Error(`Missing ${key} for ${id}`);
       r[key] = row[key];

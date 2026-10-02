@@ -55,9 +55,23 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
           gallery.current?.scrollBy({ left: (event.key === "ArrowRight" ? 1 : -1) * (gallery.current.clientWidth - 25), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
         }
       }}>
-      {resort.media.map((media, index) => <div className="photo" key={media.src}>
-        <Image src={media.src} alt={media.alt} fill sizes="(max-width: 767px) 90vw, 380px" priority={priority && index === 0} />
-      </div>)}
+      {resort.media.length > 0 ? (
+  resort.media.map((media, index) => (
+    <div className="photo" key={media.src}>
+      <Image
+        src={media.src}
+        alt={media.alt}
+        fill
+        sizes="(max-width: 767px) 90vw, 380px"
+        priority={priority && index === 0}
+      />
+    </div>
+  ))
+) : (
+  <div className="photo photo-placeholder">
+    <span>Photography coming soon</span>
+  </div>
+)}
     </div>
     <div className="card-content">
       <div className="overview">
@@ -77,31 +91,45 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
     </dd>
   </div>
 </dl>
-        {resort.season.status === "sample"}
-        <ul className="highlights">{resort.highlights.map((highlight) => <li key={highlight.text}>
-          <Image src={highlight.iconSrc} width={60} height={60} alt="" unoptimized /><span>{highlight.text}</span>
-        </li>)}{Array.from({ length: Math.max(0, 3 - resort.highlights.length) }, (_, index) => <li className="pending-highlight" key={`pending-${index}`}>Highlight pending</li>)}</ul>
+        {resort.highlights.length > 0 && (
+  <ul className="highlights">
+    {resort.highlights.map((highlight) => (
+      <li key={highlight.text}>
+        <Image
+          src={highlight.iconSrc}
+          width={60}
+          height={60}
+          alt=""
+          unoptimized
+        />
+        <span>{highlight.text}</span>
+      </li>
+    ))}
+  </ul>
+)}
 <p className="description">
   {resort.description ?? "Description not yet available."}
 </p>
 
-<div className="pros-cons">
-  <section aria-label={`${resort.name} pros`}>
-    <ul>
-      {resort.pros.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  </section>
+{(resort.pros.length > 0 || resort.cons.length > 0) && (
+  <div className="pros-cons">
+    <section aria-label={`${resort.name} pros`}>
+      <ul>
+        {resort.pros.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </section>
 
-  <section aria-label={`${resort.name} cons`}>
-    <ul>
-      {resort.cons.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  </section>
-</div>
+    <section aria-label={`${resort.name} cons`}>
+      <ul>
+        {resort.cons.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </section>
+  </div>
+)}
 
 </div>
      
