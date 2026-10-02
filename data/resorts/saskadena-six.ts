@@ -11,10 +11,11 @@ export const saskadenaSix = {
   "passes": [
     "Indy"
   ],
-  "tier": null,
+  "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": null,
+    "driveTime": "~4.5 hours",
+    "driveTimeHours": 4.5,
     "transitOptions": []
   },
   "annualSnowfallIn": 110,

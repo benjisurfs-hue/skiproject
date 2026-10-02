@@ -14,7 +14,8 @@ export const sugarbush = {
   "tier": "Premium",
   "character": "Family Friendly",
   "nycTransportation": {
-    "driveTime": "~5.5 to 6 hours",
+    "driveTime": "~5.5 hours",
+    "driveTimeHours": 5.5,
     "transitOptions": [
       {
         "type": "bus",
@@ -58,7 +59,7 @@ export const sugarbush = {
     "status": "seasonal",
     "count": 3
   },
-  "description": "Sugarbush Resort is a ski resort in the Mad River Valley in Warren, Vermont. One of the largest ski resorts in New England, it encompasses 581 skiable acres (484 on-trail acres) across two mountains connected by a quad chairlift, with 111 trails and 16 lifts.",
+  "description": "Sugarbush occupies a handsome stretch of the Mad River Valley, with 581 skiable acres spread across two mountains. There are 111 trails and 16 lifts, but the appeal is less about the numbers than the scale of the place. It feels substantial without feeling like a ski town built around a resort.",
   "highlights": [
     {
       "text": "Two mountains",

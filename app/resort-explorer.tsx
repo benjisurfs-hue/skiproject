@@ -1,13 +1,37 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+
+import {
+  CableCar,
+  CalendarDays,
+  BadgeDollarSign,
+  Snowflake,
+  Car,
+  Mountain,
+  MoveUp,
+  Signpost,
+} from "lucide-react";
+
 import { resorts } from "../data/resorts";
 import type { Resort } from "../data/resort";
-import { formatNumber, formatTerrainParks, getComparisons, sortOptions, sortResorts } from "../lib/comparisons";
 
-import { filterResorts, passFilters, type PassFilter } from "../lib/filters";
-import Link from "next/link";
+import {
+  formatNumber,
+  formatTerrainParks,
+  getComparisons,
+  sortOptions,
+  sortResorts,
+} from "../lib/comparisons";
+
+import {
+  filterResorts,
+  passFilters,
+  type PassFilter,
+} from "../lib/filters";
+
 import ResortMetadata from "./resort-metadata";
 const asset = (node: string, name: string, extension = "svg") => `/figma/${node.replace(":", "-")}-${name}.${extension}`;
 
@@ -35,7 +59,14 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
         <ResortMetadata resort={resort} />
         <dl className="headline-facts">
           <div><dt>Projected Opening Date</dt><dd>{resort.season.projectedOpening ?? "Not available"}</dd></div>
-          <div><dt>{resort.season.label} Snow Totals</dt><dd>{resort.season.snowTotalIn === null ? "Not available" : `${resort.season.snowTotalIn}″`}</dd></div>
+          <div>
+  <dt>Average Snowfall</dt>
+  <dd>
+    {resort.annualSnowfallIn === null
+      ? "Not available"
+      : `${resort.annualSnowfallIn}″`}
+  </dd>
+</div>
         </dl>
         {resort.season.status === "sample" && <p className="data-note">Opening date and season total are design samples.</p>}
         <ul className="highlights">{resort.highlights.map((highlight) => <li key={highlight.text}>
@@ -69,23 +100,78 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
   className="resort-link"
   href={`/resorts/${resort.id}`}
 >
-  View resort
+  Details
 </Link>    </div>
   </article>;
 }
-
+const sortIcons = {
+  calendar: CalendarDays,
+  car: Car,
+  snowflake: Snowflake,
+  mountain: Mountain,
+  "move-up": MoveUp,
+  "cable-car": CableCar,
+  "badge-dollar-sign": BadgeDollarSign,
+};
 export default function ResortExplorer() {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressWidth = 2 + scrollProgress * 98;
+
+  useEffect(() => {
+  const updateProgress = () => {
+    const scrollTop = window.scrollY;
+    const scrollable =
+      document.documentElement.scrollHeight - window.innerHeight;
+
+    const progress =
+      scrollable > 0 ? Math.min(scrollTop / scrollable, 1) : 0;
+
+    setScrollProgress(progress);
+  };
+
+  updateProgress();
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+
+  return () => {
+    window.removeEventListener("scroll", updateProgress);
+    window.removeEventListener("resize", updateProgress);
+  };
+}, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sortIndex, setSortIndex] = useState(0);
   const [selectedPasses, setSelectedPasses] = useState<PassFilter[]>(passFilters.map(filter => filter.key));
+const states = [...new Set(resorts.map(resort => resort.state))].sort();
+const [selectedStates, setSelectedStates] = useState<string[]>(states);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const navigation = useRef<HTMLDetailsElement>(null);
   const sortTrigger = useRef<HTMLElement>(null);
   const panelHeading = useRef<HTMLHeadingElement>(null);
   const previousScroll = useRef(0);
   const selectedSort = sortOptions[sortIndex];
-  const visibleResorts = sortResorts(filterResorts(resorts, selectedPasses, ["Vermont"]), selectedSort.key);
-  // All pass categories selected is the unfiltered default, not four active filters.
+  const passLabel =
+  selectedPasses.length === passFilters.length
+    ? "All Passes"
+    : selectedPasses.length === 0
+      ? "No Passes"
+      : selectedPasses
+          .map(pass => passFilters.find(filter => filter.key === pass)?.label)
+          .filter(Boolean)
+          .join(" + ");
+
+const stateLabel =
+  selectedStates.length === states.length
+    ? "All States"
+    : selectedStates.length === 0
+      ? "No States"
+      : selectedStates.join(" + ");
+const visibleResorts = sortResorts(
+  filterResorts(resorts, selectedPasses, selectedStates),
+  selectedSort.key
+);
+
+
+// All pass categories selected is the unfiltered default, not four active filters.
   const activeFilterCount = selectedPasses.length === passFilters.length ? 0 : selectedPasses.length;
   useEffect(() => {
     let frame = 0;
@@ -113,13 +199,10 @@ export default function ResortExplorer() {
       if (!card) return;
 
       const headerRect = header.getBoundingClientRect();
-      const cardRect = card.getBoundingClientRect();
 
       const stickyTop = parseFloat(getComputedStyle(header).top) || 0;
 
-      const isStuck =
-        headerRect.top <= stickyTop &&
-        cardRect.bottom > stickyTop + header.offsetHeight;
+      const isStuck = headerRect.top <= stickyTop;
 
       header.classList.toggle("is-stuck", isStuck);
     });
@@ -161,31 +244,100 @@ export default function ResortExplorer() {
   return <div className="site-shell" onKeyDown={(event) => { if (event.key === "Escape" && navigation.current?.open) back(); }}>
     <a href="#main" className="skip-link">Skip to resorts</a>
     <details className="filter-navigation" ref={navigation} onToggle={handleNavigationToggle}>
-      <summary className="toolbar" ref={sortTrigger} onClick={() => {
-        if (!navigation.current?.open) previousScroll.current = window.scrollY;
-      }} aria-controls="filter-sort-panel">
-        <span className="toolbar-control navigation-open"><Icon node="205:10023" name="imgFilterList" size={24} /><span>Filter / Sort{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}</span></span>
-        <span className="toolbar-control navigation-close"><Icon node="217:12197" name="imgIconChevronLeft" size={24} /><span>Back To Results</span></span>
-      </summary>
+      <summary
+  className="toolbar"
+  ref={sortTrigger}
+  onClick={() => {
+    if (!navigation.current?.open) {
+      previousScroll.current = window.scrollY;
+    }
+  }}
+  aria-controls="filter-sort-panel"
+>
+  <div
+    className="toolbar-scroll-progress"
+style={{ width: `${progressWidth}%` }}  />
+
+  <span className="toolbar-control navigation-open">
+    <Icon node="205:10023" name="imgFilterList" size={24} />
+    <span>
+      {selectedSort.label} / {passLabel} / {stateLabel}
+    </span>
+  </span>
+
+  <span className="toolbar-control navigation-close">
+    <Icon node="217:12197" name="imgIconChevronLeft" size={24} />
+    <span>Back To Results</span>
+  </span>
+</summary>
       <section id="filter-sort-panel" className="selection-panel" data-figma-node="217:12197" aria-label="Filter and sort resorts">
         <div className="sort-section">
           <h1 ref={panelHeading} tabIndex={-1}>Sort Resorts By:</h1>
           <div className="options sort-options" role="radiogroup" aria-label="Sort resorts">
-            {sortOptions.map((option, index) => <label key={option.key} className={`sort-option${sortIndex === index ? " selected" : ""}`}>
-              <input className="sr-only" type="radio" name="resort-sort" checked={sortIndex === index} onChange={() => { setSortIndex(index); previousScroll.current = 0; }} />
-              <span>{option.label}</span>
-            </label>)}
+{sortOptions.map((option, index) => {
+const SortIcon = sortIcons[option.icon];
+  return (
+    <label
+      key={option.key}
+      className={`sort-option${sortIndex === index ? " selected" : ""}`}
+    >
+      <input
+        className="sr-only"
+        type="radio"
+        name="resort-sort"
+        checked={sortIndex === index}
+        onChange={() => {
+          setSortIndex(index);
+          previousScroll.current = 0;
+        }}
+      />
+
+      {SortIcon && <SortIcon size={20} strokeWidth={1.5} />}
+
+      <span>{option.label}</span>
+    </label>
+  );
+})}
           </div>
         </div>
         <div className="filter-section">
-          <h2>By Multi-pass</h2>
+          <h1>By Multi-pass</h1>
           <div className="options" role="group" aria-label="Multi-pass filters">
             {passFilters.map(filter => <label className="filter-option" key={filter.key}>
               <input className="sr-only" type="checkbox" checked={selectedPasses.includes(filter.key)} onChange={() => togglePass(filter.key)} />
               <span className="filter-mark"><Icon node="217:12197" name="imgIconCheck" size={24} /></span><span>{filter.label}</span>
             </label>)}
           </div>
+   <h1 className="state-filter-heading">By State</h1>
 
+  <div className="options" role="group" aria-label="State filters">
+    {states.map(state => (
+      <label className="filter-option" key={state}>
+        <input
+          className="sr-only"
+          type="checkbox"
+          checked={selectedStates.includes(state)}
+          onChange={() =>
+            setSelectedStates(current =>
+              current.includes(state)
+                ? current.filter(item => item !== state)
+                : [...current, state]
+            )
+          }
+        />
+
+        <span className="filter-mark">
+          <Icon
+            node="217:12197"
+            name="imgIconCheck"
+            size={24}
+          />
+        </span>
+
+        <span>{state}</span>
+      </label>
+    ))}
+  </div>
         </div>
         <div className="menu-bottom toolbar">{backButton}</div>
       </section>

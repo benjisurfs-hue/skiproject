@@ -9,10 +9,11 @@ export const madRiverGlen = {
   "coordinates": null,
   "figmaNode": null,
   "passes": [],
-  "tier": null,
+ "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~5.5 to 6 hours",
+    "driveTime": "~5.5 hours",
+    "driveTimeHours": 5.5,
     "transitOptions": []
   },
   "annualSnowfallIn": 228,

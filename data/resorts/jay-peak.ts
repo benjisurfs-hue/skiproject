@@ -14,7 +14,8 @@ export const jayPeak = {
   "tier": "Value",
   "character": "Powder Paradise",
   "nycTransportation": {
-    "driveTime": "~7.5 to 8 hours",
+    "driveTime": "~6 hours",
+    "driveTimeHours": 6,
     "transitOptions": [
       {
         "type": "bus",
@@ -58,7 +59,7 @@ export const jayPeak = {
     "status": "seasonal",
     "count": 3
   },
-  "description": "Jay Peak Resort sits near the Canadian border and receives more natural snowfall than any other resort in eastern North America. With 385 acres of skiable terrain, 81 trails, and an indoor waterpark, it's a unique year-round destination.",
+  "description": "Bienvenue à Jay. Almost Canada, technically Vermont. Jay Peak sits far enough north that getting there feels like part of the trip. It gets some of the best natural snow in the East, with 385 acres and 81 trails. There’s also an indoor waterpark, which sounds slightly absurd until you’ve spent a January afternoon in Vermont.",
   "highlights": [
     {
       "text": "Most snow in the East",

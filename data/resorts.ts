@@ -16,6 +16,10 @@ import { mountSnow } from "./resorts/mount-snow";
 import { okemo } from "./resorts/okemo";
 import { stratton } from "./resorts/stratton";
 import { ascutney } from "./resorts/ascutney";
+import { windham } from "./resorts/windham";
+import { catamount } from "./resorts/catamount";
+import { jiminyPeak } from "./resorts/jiminy-peak";
+
 
 // Vermont V1: static facts, MAKE.md overrides, and preserved editorial content.
 // No runtime data fetching. Null means not verified; [] passes means no tracked multi-pass.
@@ -37,4 +41,7 @@ export const resorts: Resort[] = [
   mountSnow,
   okemo,
   stratton,
+  windham,
+  catamount,
+  jiminyPeak,
 ];

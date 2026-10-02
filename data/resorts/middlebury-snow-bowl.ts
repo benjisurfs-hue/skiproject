@@ -5,16 +5,17 @@ export const middleburySnowBowl = {
   "slug": "middlebury-snow-bowl",
   "name": "Middlebury Snow Bowl",
   "state": "Vermont",
-  "region": "Hancock, Vermont",
+  "region": "Central Vermont",
   "coordinates": null,
   "figmaNode": null,
   "passes": [
     "Indy"
   ],
-  "tier": null,
+  "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": null,
+    "driveTime": "~5.25 hours",
+    "driveTimeHours": 5.25,
     "transitOptions": []
   },
   "annualSnowfallIn": 150,

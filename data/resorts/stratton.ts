@@ -11,10 +11,11 @@ export const stratton = {
   "passes": [
     "Ikon"
   ],
-  "tier": null,
+ "tier": "Premium",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~4.5 to 5 hours",
+    "driveTime": "~4 hours",
+    "driveTimeHours": 4,
     "transitOptions": [
       {
         "type": "bus",

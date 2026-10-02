@@ -14,7 +14,8 @@ export const smugglersNotch = {
   "tier": "Value",
   "character": "All-Season",
   "nycTransportation": {
-    "driveTime": "~6.5 to 7.5 hours",
+    "driveTime": "~6 hours",
+    "driveTimeHours": 6,
     "transitOptions": []
   },
   "annualSnowfallIn": 322,
@@ -51,7 +52,7 @@ export const smugglersNotch = {
     "status": "seasonal",
     "count": 2
   },
-  "description": "Smugglers' Notch Resort is a family-friendly four-season destination in the Green Mountains. With three interconnected peaks offering 78 trails across 1,000 acres, 'Smuggs' is consistently ranked as one of the top family ski resorts in North America.",
+  "description": "Smugglers’ Notch—or Smuggs, as everyone calls it—spreads across three peaks in the Green Mountains, with 78 trails and roughly 1,000 acres. It has a longstanding reputation as a family mountain, though that description undersells the skiing. There’s plenty here once the kids have gone inside.",
   "highlights": [
     {
       "text": "Family-oriented programs",

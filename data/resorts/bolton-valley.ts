@@ -11,10 +11,11 @@ export const boltonValley = {
   "passes": [
     "Indy"
   ],
-  "tier": null,
+  "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": null,
+    "driveTime": "~5.25 hours",
+    "driveTimeHours": 5.25,
     "transitOptions": [
       {
         "type": "train",

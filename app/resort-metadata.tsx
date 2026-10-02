@@ -23,7 +23,7 @@ export default function ResortMetadata({ resort }: { resort: MetadataResort }) {
       key={pass} type="button" className={`tag metadata-pass pass-${pass.toLowerCase()}`}
       aria-haspopup="dialog" aria-label={`${pass} Pass information for ${resort.name}`}
       onClick={(event) => { event.stopPropagation(); openInfo({ kind: "pass", pass }, event.currentTarget); }}
-    >{pass}</button>) : <span className="tag">Not on multi-pass</span>}
+    >{pass}</button>) : <span className="no-multipass">Multi-pass</span>}
     {resort.tier && <span className={`tag tier-${resort.tier.toLowerCase()}`}>{resort.tier}</span>}
     {driveTime && <button
       type="button" className="transportation-button" aria-haspopup="dialog"

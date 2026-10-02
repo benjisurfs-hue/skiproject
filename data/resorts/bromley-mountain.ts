@@ -9,10 +9,11 @@ export const bromleyMountain = {
   "coordinates": null,
   "figmaNode": null,
   "passes": [],
-  "tier": null,
+ "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~4.5 hours",
+    "driveTime": "~4 hours",
+    "driveTimeHours": 4,
     "transitOptions": []
   },
   "annualSnowfallIn": 145,

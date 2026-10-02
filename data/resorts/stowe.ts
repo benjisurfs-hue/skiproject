@@ -11,10 +11,11 @@ export const stowe = {
   "passes": [
     "Epic"
   ],
-  "tier": null,
+ "tier": "Luxury",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~6 to 7 hours",
+    "driveTime": "~6.25 hours",
+    "driveTimeHours": 6.25,
     "transitOptions": [
       {
         "type": "train",

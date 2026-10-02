@@ -11,10 +11,11 @@ export const burkeMountain = {
   "passes": [
     "Indy"
   ],
-  "tier": null,
+   "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": null,
+    "driveTime": "~5.5 hours",
+    "driveTimeHours": 5.5,
     "transitOptions": []
   },
   "annualSnowfallIn": 217,
@@ -54,8 +55,8 @@ export const burkeMountain = {
   "description": "Burke is a long way from most things, which is part of the point. The skiing is sustained, the crowds are modest, and the mountain has little interest in pretending to be a resort town.",
   "highlights": [
     {
-      "text": "Kingdom trails & setting",
-      "iconSrc": "/icons-highlights/barn 1.svg"
+      "text": "Developed Olympian Mikaela Shiffrin ",
+      "iconSrc": "/icons-highlights/olympics.svg"
     },
     {
       "text": "Long sustained runs",

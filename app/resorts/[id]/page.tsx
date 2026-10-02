@@ -62,10 +62,10 @@ export default async function ResortPage({ params }: ResortPageProps) {
             className="comparisons"
             aria-label={`${resort.name} comparison`}
           >
-            <h2>How It Compares</h2>
+            <h2>How {resort.name} Compares</h2>
 
             <p className="comparison-subtitle">
-              Across {resorts.length} Vermont resorts
+              Across {resorts.length} Northeast ski areas
             </p>
 
             <dl className="comparison-list">

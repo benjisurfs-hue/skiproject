@@ -11,10 +11,11 @@ export const picoMountain = {
   "passes": [
     "Ikon"
   ],
-  "tier": null,
+ "tier": "Premium",
   "character": null,
   "nycTransportation": {
     "driveTime": "~5 hours",
+    "driveTimeHours": 5,
     "transitOptions": [
       {
         "type": "train",

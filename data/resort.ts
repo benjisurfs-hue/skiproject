@@ -16,6 +16,7 @@ export type TransitOption = {
 };
 export type NycTransportation = {
   driveTime: string | null;
+  driveTimeHours: number | null;
   transitOptions: TransitOption[];
 };
 export type Resort = {

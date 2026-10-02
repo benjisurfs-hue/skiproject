@@ -1,5 +1,7 @@
 import type { Resort, TerrainParks } from "../data/resort";
 
+
+
 export type MetricKey = "annualSnowfallIn" | "skiableAcres" | "verticalFt" | "liftAccess" | "affordability";
 export const formatNumber = (value: number) => value.toLocaleString("en-US", { maximumFractionDigits: 1 });
 export const comparisonMetrics = [
@@ -45,22 +47,58 @@ export function getComparisons(resort: Resort, reference: readonly Resort[]) {
 }
 
 export const sortOptions = [
-  { key: "openingOrder", label: "Projected Opening Date", short: "Opening Date" },
-  { key: "snowTotalIn", label: "Season snowfall (2025/26)", short: "Season Snowfall" },
-  { key: "annualSnowfallIn", label: "Average snowfall", short: "Average Snowfall" },
-  { key: "skiableAcres", label: "Mountain size", short: "Mountain Size" },
-  { key: "verticalFt", label: "Vertical", short: "Vertical" },
-  { key: "liftAccess", label: "Lift access", short: "Lift Access" },
-  { key: "affordability", label: "Affordability", short: "Affordability" },
+  {
+    key: "openingOrder",
+    label: "Projected Opening Date",
+    short: "Opening Date",
+    icon: "calendar",
+  },
+  {
+    key: "distance",
+    label: "Drive Time from NYC",
+    short: "Drive Time from NYC",
+    icon: "car",
+  },
+  {
+    key: "annualSnowfallIn",
+    label: "Average Snowfall",
+    short: "Average Snowfall",
+    icon: "snowflake",
+  },
+  {
+    key: "skiableAcres",
+    label: "Mountain Size",
+    short: "Mountain Size",
+    icon: "mountain",
+  },
+  {
+    key: "verticalFt",
+    label: "Vertical",
+    short: "Vertical",
+    icon: "move-up",
+  },
+  {
+    key: "liftAccess",
+    label: "Lift Access",
+    short: "Lift Access",
+    icon: "cable-car",
+  },
+  {
+    key: "affordability",
+    label: "Affordability",
+    short: "Affordability",
+    icon: "badge-dollar-sign",
+  },
 ] as const;
 export type SortKey = (typeof sortOptions)[number]["key"];
 export function sortResorts(resorts: readonly Resort[], key: SortKey): Resort[] {
-  const value = (resort: Resort) => key === "openingOrder" || key === "snowTotalIn" ? resort.season[key] : metricValue(resort, key);
+  const value = (resort: Resort) => key === "distance" ? resort.nycTransportation.driveTimeHours
+    : key === "openingOrder" ? resort.season[key] : metricValue(resort, key);
   return [...resorts].sort((a, b) => {
     const left = value(a), right = value(b);
     if (!isValidMetric(left)) return isValidMetric(right) ? 1 : 0;
     if (!isValidMetric(right)) return -1;
-    return (left - right) * (key === "openingOrder" ? 1 : -1);
+    return (left - right) * (key === "openingOrder" || key === "distance" ? 1 : -1);
   });
 }
 

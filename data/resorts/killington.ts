@@ -11,10 +11,11 @@ export const killington = {
   "passes": [
     "Ikon"
   ],
-  "tier": null,
+  "tier": "Luxury",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~4.5 to 5.5 hours",
+    "driveTime": "~4.75 hours",
+    "driveTimeHours": 4.75,
     "transitOptions": [
       {
         "type": "train",

@@ -11,10 +11,11 @@ export const mountSnow = {
   "passes": [
     "Epic"
   ],
-  "tier": null,
+ "tier": "Premium",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~4 to 5 hours",
+    "driveTime": "~4 hours",
+    "driveTimeHours": 4,
     "transitOptions": [
       {
         "type": "train",

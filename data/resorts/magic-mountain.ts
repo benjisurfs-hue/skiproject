@@ -11,10 +11,11 @@ export const magicMountain = {
   "passes": [
     "Indy"
   ],
-  "tier": null,
+  "tier": "Value",
   "character": null,
   "nycTransportation": {
-    "driveTime": "~4.5 to 5 hours",
+    "driveTime": "~4 hours",
+    "driveTimeHours": 4,
     "transitOptions": []
   },
   "annualSnowfallIn": 130,
