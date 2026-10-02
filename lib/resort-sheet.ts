@@ -1,7 +1,7 @@
 import { parse } from "csv-parse/sync";
 import type { Pass, PrototypeScore, Resort, TerrainParks } from "../data/resort";
 
-export const sheetColumns = "id,slug,name,state,region,latitude,longitude,passes,tier,character,annualSnowfallIn,skiableAcres,verticalFt,trailCount,liftCount,summitElevationFt,baseElevationFt,liftAccessScore,liftAccessLabel,affordabilityScore,affordabilityLabel,priceBand,projectedOpening,beginner,intermediate,advanced,terrainParks,description,highlight1,highlight1Icon,highlight2,highlight2Icon,highlight3,highlight3Icon,website,nycDriveTime,nycBusAvailable,lastVerified,published".split(",");
+export const sheetColumns = "id,slug,name,state,region,latitude,longitude,passes,tier,character,annualSnowfallIn,skiableAcres,verticalFt,trailCount,liftCount,summitElevationFt,baseElevationFt,liftAccessScore,liftAccessLabel,affordabilityScore,affordabilityLabel,priceBand,projectedOpening,beginner,intermediate,advanced,terrainParks,description,highlight1,highlight1Icon,highlight2,highlight2Icon,highlight3,highlight3Icon,photo1,photo2,photo3,website,nycDriveTime,nycBusAvailable,lastVerified,published".split(",");
 
 function number(value: string, field: string, min = 0, max = Infinity): number | null {
   if (!value.trim()) return null;
@@ -158,7 +158,22 @@ const r: Resort = structuredClone(base);
   { text: row.highlight2, iconSrc: row.highlight2Icon },
   { text: row.highlight3, iconSrc: row.highlight3Icon },
 ].filter(highlight => highlight.text.trim() && highlight.iconSrc.trim());
+const sheetPhotos = [
+  row.photo1,
+  row.photo2,
+  row.photo3,
+]
+  .map(src => src.trim())
+  .filter(Boolean);
 
+if (sheetPhotos.length > 0) {
+  r.media = sheetPhotos.map((src, index) => ({
+    kind: "image" as const,
+    role: "resort" as const,
+    src,
+    alt: `${r.name} ski area${index === 0 ? "" : ` photo ${index + 1}`}`,
+  }));
+}
 if (sheetHighlights.length > 0) {
   r.highlights = sheetHighlights;
 }
