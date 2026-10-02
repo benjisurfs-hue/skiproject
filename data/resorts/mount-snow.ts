@@ -55,7 +55,7 @@ export const mountSnow = {
   "season": {
     "label": "2025/26",
     "snowTotalIn": null,
-    "projectedOpening": null,
+    "projectedOpening": "2026-11-21",
     "openingOrder": null,
     "status": "unavailable"
   },

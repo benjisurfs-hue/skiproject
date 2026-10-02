@@ -12,16 +12,12 @@ import {
   Car,
   Mountain,
   MoveUp,
-  Signpost,
 } from "lucide-react";
 
 import { resorts } from "../data/resorts";
 import type { Resort } from "../data/resort";
 
 import {
-  formatNumber,
-  formatTerrainParks,
-  getComparisons,
   sortOptions,
   sortResorts,
 } from "../lib/comparisons";
@@ -37,6 +33,15 @@ const asset = (node: string, name: string, extension = "svg") => `/figma/${node.
 
 function Icon({ node, name, size }: { node: string; name: string; size: number }) {
   return <Image src={asset(node, name)} width={size} height={size} alt="" unoptimized />;
+}
+
+function formatOpeningDate(date: string | null | undefined) {
+  if (!date) return "To be announced";
+
+  return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+  });
 }
 
 function ResortCard({ resort, priority }: { resort: Resort; priority: boolean }) {
@@ -57,18 +62,22 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
     <div className="card-content">
       <div className="overview">
         <ResortMetadata resort={resort} />
-        <dl className="headline-facts">
-          <div><dt>Projected Opening Date</dt><dd>{resort.season.projectedOpening ?? "Not available"}</dd></div>
-          <div>
-  <dt>Average Snowfall</dt>
-  <dd>
-    {resort.annualSnowfallIn === null
-      ? "Not available"
-      : `${resort.annualSnowfallIn}″`}
-  </dd>
-</div>
-        </dl>
-        {resort.season.status === "sample" && <p className="data-note">Opening date and season total are design samples.</p>}
+<dl className="headline-facts">
+  <div>
+    <dt>Projected Opening Date</dt>
+    <dd>{formatOpeningDate(resort.season.projectedOpening)}</dd>
+  </div>
+
+  <div>
+    <dt>Average Snowfall</dt>
+    <dd>
+      {resort.annualSnowfallIn === null
+        ? "Not available"
+        : `${resort.annualSnowfallIn}″`}
+    </dd>
+  </div>
+</dl>
+        {resort.season.status === "sample"}
         <ul className="highlights">{resort.highlights.map((highlight) => <li key={highlight.text}>
           <Image src={highlight.iconSrc} width={60} height={60} alt="" unoptimized /><span>{highlight.text}</span>
         </li>)}{Array.from({ length: Math.max(0, 3 - resort.highlights.length) }, (_, index) => <li className="pending-highlight" key={`pending-${index}`}>Highlight pending</li>)}</ul>
@@ -113,13 +122,19 @@ const sortIcons = {
   "cable-car": CableCar,
   "badge-dollar-sign": BadgeDollarSign,
 };
+const states = [...new Set(resorts.map(resort => resort.state))].sort();
+
 export default function ResortExplorer() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigation = useRef<HTMLDetailsElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const progressWidth = 2 + scrollProgress * 98;
 
   useEffect(() => {
   const updateProgress = () => {
-    const scrollTop = window.scrollY;
+    // The toolbar tracks the results, not scrolling through the filter menu.
+    if (navigation.current?.open) return;
+    const scrollTop = Math.max(0, window.scrollY);
     const scrollable =
       document.documentElement.scrollHeight - window.innerHeight;
 
@@ -137,14 +152,11 @@ export default function ResortExplorer() {
     window.removeEventListener("scroll", updateProgress);
     window.removeEventListener("resize", updateProgress);
   };
-}, []);
-  const [menuOpen, setMenuOpen] = useState(false);
+}, [menuOpen]);
   const [sortIndex, setSortIndex] = useState(0);
   const [selectedPasses, setSelectedPasses] = useState<PassFilter[]>(passFilters.map(filter => filter.key));
-const states = [...new Set(resorts.map(resort => resort.state))].sort();
 const [selectedStates, setSelectedStates] = useState<string[]>(states);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const navigation = useRef<HTMLDetailsElement>(null);
   const sortTrigger = useRef<HTMLElement>(null);
   const panelHeading = useRef<HTMLHeadingElement>(null);
   const previousScroll = useRef(0);
@@ -171,8 +183,6 @@ const visibleResorts = sortResorts(
 );
 
 
-// All pass categories selected is the unfiltered default, not four active filters.
-  const activeFilterCount = selectedPasses.length === passFilters.length ? 0 : selectedPasses.length;
   useEffect(() => {
     let frame = 0;
     const update = () => {
@@ -212,7 +222,7 @@ const visibleResorts = sortResorts(
   update();
 
   return () => window.removeEventListener("scroll", update);
-}, []);
+}, [menuOpen, sortIndex, selectedPasses, selectedStates]);
   function openMenu() {
     previousScroll.current = window.scrollY;
     if (navigation.current) navigation.current.open = true;
@@ -224,6 +234,7 @@ const visibleResorts = sortResorts(
     const open = event.currentTarget.open;
     setMenuOpen(open);
     requestAnimationFrame(() => {
+      if (navigation.current?.open !== open) return;
       if (open) {
         window.scrollTo(0, 0);
         panelHeading.current?.focus({ preventScroll: true });
@@ -235,6 +246,21 @@ const visibleResorts = sortResorts(
   }
   function backToTop() {
     window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  }
+  function revealFocusedOption(event: React.FocusEvent<HTMLElement>) {
+    const option = event.target.closest<HTMLElement>(".sort-option, .filter-option");
+    const toolbar = sortTrigger.current;
+    const returnBar = event.currentTarget.querySelector<HTMLElement>(".menu-bottom");
+    if (!option || !toolbar || !returnBar) return;
+    const bounds = option.getBoundingClientRect();
+    if (bounds.top < toolbar.getBoundingClientRect().bottom + 8 ||
+        bounds.bottom > returnBar.getBoundingClientRect().top - 8) {
+      option.scrollIntoView({ block: "nearest", behavior: "instant" });
+    }
+  }
+  function toggleState(state: string) {
+    setSelectedStates(current => current.includes(state) ? current.filter(item => item !== state) : [...current, state]);
+    previousScroll.current = 0;
   }
   function togglePass(pass: PassFilter) {
     setSelectedPasses(current => current.includes(pass) ? current.filter(item => item !== pass) : [...current, pass]);
@@ -255,6 +281,7 @@ const visibleResorts = sortResorts(
   aria-controls="filter-sort-panel"
 >
   <div
+    aria-hidden="true"
     className="toolbar-scroll-progress"
 style={{ width: `${progressWidth}%` }}  />
 
@@ -265,12 +292,8 @@ style={{ width: `${progressWidth}%` }}  />
     </span>
   </span>
 
-  <span className="toolbar-control navigation-close">
-    <Icon node="217:12197" name="imgIconChevronLeft" size={24} />
-    <span>Back To Results</span>
-  </span>
 </summary>
-      <section id="filter-sort-panel" className="selection-panel" data-figma-node="217:12197" aria-label="Filter and sort resorts">
+      <section id="filter-sort-panel" className="selection-panel" data-figma-node="624:23204" aria-label="Filter and sort resorts" onFocus={revealFocusedOption}>
         <div className="sort-section">
           <h1 ref={panelHeading} tabIndex={-1}>Sort Resorts By:</h1>
           <div className="options sort-options" role="radiogroup" aria-label="Sort resorts">
@@ -317,13 +340,7 @@ const SortIcon = sortIcons[option.icon];
           className="sr-only"
           type="checkbox"
           checked={selectedStates.includes(state)}
-          onChange={() =>
-            setSelectedStates(current =>
-              current.includes(state)
-                ? current.filter(item => item !== state)
-                : [...current, state]
-            )
-          }
+          onChange={() => toggleState(state)}
         />
 
         <span className="filter-mark">
@@ -347,7 +364,7 @@ const SortIcon = sortIcons[option.icon];
       <p className="sr-only" aria-live="polite">{visibleResorts.length} resorts sorted by {selectedSort.label}</p>
       <div className="resort-list">{visibleResorts.map((resort, index) => <ResortCard key={resort.id} resort={resort} priority={index === 0} />)}</div>
       {!visibleResorts.length && <p className="empty-results">No resorts match these filters. <button type="button" onClick={openMenu}>Adjust filters</button></p>}
-      <footer>Vermont V1 · Local data · Prototype ratings</footer>
+      <footer>Northeast Ski Areas V1 · Local data · Prototype ratings</footer>
     </main>
     {!menuOpen && showBackToTop && <button type="button" className="back-to-top" aria-label="Back to top" onClick={backToTop}>↑ <span>Back to top</span></button>}
   </div>;

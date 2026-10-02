@@ -29,7 +29,7 @@ export default function ResortMetadata({ resort }: { resort: MetadataResort }) {
       type="button" className="transportation-button" aria-haspopup="dialog"
       aria-label={`Drive time from NYC to ${resort.name}: ${driveTime}`}
       onClick={(event) => { event.stopPropagation(); openInfo({ kind: "drive", resortName: resort.name, driveTime }, event.currentTarget); }}
-    ><Car size={16} strokeWidth={1.5} aria-hidden="true" /><span>NYC → {driveTime}</span></button>}
+    ><Car size={16} strokeWidth={1.5} aria-hidden="true" /><span>NYC{driveTime}</span></button>}
     {transitTypes.map(type => {
       const options = transitOptions.filter(option => option.type === type);
       if (!options.length) return null;

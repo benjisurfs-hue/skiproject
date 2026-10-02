@@ -5,7 +5,7 @@ export const jiminyPeak = {
   slug: "jiminy-peak",
   name: "Jiminy Peak",
   state: "Massachusetts",
-  region: "Berkshires, Massachusetts",
+  region: "Berkshires / Massachusetts",
 
   coordinates: {
     latitude: 42.555,
@@ -49,7 +49,7 @@ export const jiminyPeak = {
   season: {
     label: "2026/27",
     snowTotalIn: null,
-    projectedOpening: "Nov 27",
+    projectedOpening: "2026-11-27",
     openingOrder: null,
     status: "sample",
   },

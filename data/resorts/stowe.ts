@@ -55,7 +55,7 @@ export const stowe = {
   "season": {
     "label": "2025/26",
     "snowTotalIn": null,
-    "projectedOpening": null,
+    "projectedOpening": "2026-11-20",
     "openingOrder": null,
     "status": "unavailable"
   },

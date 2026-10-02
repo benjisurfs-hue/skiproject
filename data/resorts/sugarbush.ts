@@ -46,7 +46,7 @@ export const sugarbush = {
   "season": {
     "label": "2025/26",
     "snowTotalIn": 265,
-    "projectedOpening": "November 25th",
+    "projectedOpening": "2026-11-25",
     "openingOrder": 1125,
     "status": "sample"
   },

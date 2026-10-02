@@ -46,7 +46,7 @@ export const jayPeak = {
   "season": {
     "label": "2025/26",
     "snowTotalIn": 350,
-    "projectedOpening": "November 20th",
+    "projectedOpening": "2026-11-22",
     "openingOrder": 1120,
     "status": "sample"
   },

@@ -39,7 +39,7 @@ export const smugglersNotch = {
   "season": {
     "label": "2025/26",
     "snowTotalIn": 250,
-    "projectedOpening": "December 5th",
+    "projectedOpening": "2026-12-05",
     "openingOrder": 1205,
     "status": "sample"
   },

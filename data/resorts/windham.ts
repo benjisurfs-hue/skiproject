@@ -5,7 +5,7 @@ export const windham = {
   slug: "windham",
   name: "Windham Mountain Club",
   state: "New York",
-  region: "Catskills, New York",
+  region: "Catskills / New York",
 
   coordinates: {
     latitude: 42.2987,
@@ -49,7 +49,7 @@ export const windham = {
   season: {
     label: "2025/26",
     snowTotalIn: null,
-    projectedOpening: null,
+    projectedOpening: "2026-12-04",
     openingOrder: null,
     status: "unavailable"
   },

@@ -46,7 +46,7 @@ export const stratton = {
   "season": {
     "label": "2025/26",
     "snowTotalIn": null,
-    "projectedOpening": null,
+    "projectedOpening": "2026-11-18",
     "openingOrder": null,
     "status": "unavailable"
   },

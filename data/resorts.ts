@@ -19,6 +19,8 @@ import { ascutney } from "./resorts/ascutney";
 import { windham } from "./resorts/windham";
 import { catamount } from "./resorts/catamount";
 import { jiminyPeak } from "./resorts/jiminy-peak";
+import { hunter } from "./resorts/hunter";
+
 
 
 // Vermont V1: static facts, MAKE.md overrides, and preserved editorial content.
@@ -44,4 +46,5 @@ export const resorts: Resort[] = [
   windham,
   catamount,
   jiminyPeak,
+  hunter,
 ];

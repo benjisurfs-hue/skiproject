@@ -5,7 +5,7 @@ export const catamount = {
   slug: "catamount",
   name: "Catamount",
   state: "New York",
-  region: "Berkshires / Hudson Valley",
+  region: "Berkshires / New York",
 
   coordinates: {
     latitude: 42.169,
@@ -100,19 +100,19 @@ export const catamount = {
     {
       kind: "image",
       role: "resort",
-      src: "/resorts/catamount/1.png",
+      src: "/resorts/catamountski/1.png",
       alt: "Catamount Mountain Resort — resort photograph 1 of 3",
     },
     {
       kind: "image",
       role: "resort",
-      src: "/resorts/catamount/2.png",
+      src: "/resorts/catamountski/2.png",
       alt: "Catamount Mountain Resort — resort photograph 2 of 3",
     },
     {
       kind: "image",
       role: "resort",
-      src: "/resorts/catamount/3.png",
+      src: "/resorts/catamountski/3.png",
       alt: "Catamount Mountain Resort — resort photograph 3 of 3",
     },
   ],

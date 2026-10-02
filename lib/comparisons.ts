@@ -5,10 +5,10 @@ import type { Resort, TerrainParks } from "../data/resort";
 export type MetricKey = "annualSnowfallIn" | "skiableAcres" | "verticalFt" | "liftAccess" | "affordability";
 export const formatNumber = (value: number) => value.toLocaleString("en-US", { maximumFractionDigits: 1 });
 export const comparisonMetrics = [
-  { key: "annualSnowfallIn", label: "Snowfall" },
-  { key: "skiableAcres", label: "Mountain Size" },
-  { key: "verticalFt", label: "Vertical" },
-  { key: "liftAccess", label: "Lift Access" },
+  { key: "annualSnowfallIn", label: "Average snowfall" },
+  { key: "skiableAcres", label: "Ski area size" },
+  { key: "verticalFt", label: "Length of ski runs" },
+  { key: "liftAccess", label: "Atmosphere" },
   { key: "affordability", label: "Affordability" },
 ] as const;
 
@@ -67,8 +67,8 @@ export const sortOptions = [
   },
   {
     key: "skiableAcres",
-    label: "Mountain Size",
-    short: "Mountain Size",
+    label: "Skiable Terrain",
+    short: "Skiable Terrain",
     icon: "mountain",
   },
   {
@@ -91,14 +91,42 @@ export const sortOptions = [
   },
 ] as const;
 export type SortKey = (typeof sortOptions)[number]["key"];
-export function sortResorts(resorts: readonly Resort[], key: SortKey): Resort[] {
-  const value = (resort: Resort) => key === "distance" ? resort.nycTransportation.driveTimeHours
-    : key === "openingOrder" ? resort.season[key] : metricValue(resort, key);
+export function sortResorts(
+  resorts: readonly Resort[],
+  key: SortKey
+): Resort[] {
+  const value = (resort: Resort): number | null => {
+    if (key === "distance") {
+      return resort.nycTransportation.driveTimeHours;
+    }
+
+    if (key === "openingOrder") {
+      const date = resort.season.projectedOpening;
+
+      if (!date) return null;
+
+      const timestamp = Date.parse(date);
+
+      return Number.isNaN(timestamp) ? null : timestamp;
+    }
+
+    return metricValue(resort, key);
+  };
+
   return [...resorts].sort((a, b) => {
-    const left = value(a), right = value(b);
-    if (!isValidMetric(left)) return isValidMetric(right) ? 1 : 0;
+    const left = value(a);
+    const right = value(b);
+
+    if (!isValidMetric(left)) {
+      return isValidMetric(right) ? 1 : 0;
+    }
+
     if (!isValidMetric(right)) return -1;
-    return (left - right) * (key === "openingOrder" || key === "distance" ? 1 : -1);
+
+    return (
+      (left - right) *
+      (key === "openingOrder" || key === "distance" ? 1 : -1)
+    );
   });
 }
 
