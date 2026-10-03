@@ -36,7 +36,7 @@ ul { list-style: none; padding: 0; }
 .highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; }
 .highlights li { padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; font-size: 12px; line-height: 16px; font-weight: 700; text-align: center; }
 .highlights img { flex: 0 0 auto; }
-.description { font-size: 16px; line-height: 135%; font-weight: 400; padding: 0 0 1.5vh 0;}
+.description {   font-family: var(--font-ibm-plex-serif), serif; font-size: 16px; line-height: 135%; font-weight: 400; padding: 0 0 1.5vh 0;}
 .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 14px; line-height: 20px; }
 .pros-cons h3 { font-size: 14px; line-height: 20px; font-weight: 700; margin-bottom: 4px; }
 .pros-cons ul { display: flex; flex-direction: column; gap: 4px; }
@@ -441,3 +441,4 @@ input + .lucide {
 .bar-fill.is-visible {
   width: var(--bar-width) !important;
 }
+

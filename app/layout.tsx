@@ -1,4 +1,4 @@
-import { Libre_Franklin } from "next/font/google";
+import { Libre_Franklin, IBM_Plex_Serif } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import ResortInfoProvider from "./resort-info-provider";
@@ -7,6 +7,12 @@ const libreFranklin = Libre_Franklin({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-libre-franklin",
+});
+
+const ibmPlexSerif = IBM_Plex_Serif({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-plex-serif",
 });
 
 export const metadata: Metadata = {
@@ -22,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={libreFranklin.variable}>
+      <body className={`${libreFranklin.variable} ${ibmPlexSerif.variable}`}>
         <ResortInfoProvider>{children}</ResortInfoProvider>
       </body>
     </html>
