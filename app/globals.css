@@ -442,3 +442,7 @@ input + .lucide {
   width: var(--bar-width) !important;
 }
 
+.filtericon {
+    font-size: 20px;    
+    font-weight: bold;
+}

@@ -378,7 +378,7 @@ const visibleResorts = sortResorts(
 style={{ width: `${progressWidth}%` }}  />
 
   <span className="toolbar-control navigation-open">
-    <Icon node="205:10023" name="imgFilterList" size={24} />
+    <span className="filtericon">&#x21C5;</span>
     <span>
       {selectedSort.label} / {passLabel} / {stateLabel}
     </span>
