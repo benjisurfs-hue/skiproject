@@ -32,14 +32,8 @@ export default async function ResortPage({ params }: ResortPageProps) {
         aria-label="Resort navigation"
       >
         <Link href="/" className="toolbar-control">
-          <Image
-            src="/figma/217-12197-imgIconChevronLeft.svg"
-            width={24}
-            height={24}
-            alt=""
-            unoptimized
-          />
-          <span>Back To Results</span>
+
+          <span>&#x20EA;</span><span>Back to list</span>
         </Link>
       </nav>
 
