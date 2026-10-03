@@ -14,7 +14,8 @@ type ResortPageProps = {
     id: string;
   }>;
 };
-
+import AnimatedBar from "./animated-bar";
+ 
 export const dynamic = "force-dynamic";
 
 export default async function ResortPage({ params }: ResortPageProps) {
@@ -25,6 +26,9 @@ export default async function ResortPage({ params }: ResortPageProps) {
     notFound();
   }
   const comparisons = getComparisons(resort, resorts);
+
+
+
   return (
     <main className="site-shell resort-detail">
       <nav
@@ -66,59 +70,49 @@ export default async function ResortPage({ params }: ResortPageProps) {
               Across {resorts.length} Northeast ski areas
             </p>
 
-            <dl className="comparison-list">
-              {comparisons.map((stat) => (
-                <div className="comparison" key={stat.label}>
-                  <dt>{stat.label}</dt>
+<dl className="comparison-list">
+  {comparisons.map((stat) => (
+    <div className="comparison" key={stat.label}>
+      <dt>{stat.label}</dt>
 
-                  <dd>
-                    <span
-                      className="bar"
-                      role={stat.score === null ? undefined : "meter"}
-                      aria-label={`${stat.label}: ${stat.value}`}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-valuenow={stat.score ?? undefined}
-                      aria-valuetext={
-                        stat.score === null
-                          ? "Not available"
-                          : `${Math.round(stat.score)} out of 100; more fill is better${
-                              stat.prototype
-                                ? "; prototype rating"
-                                : "; Vermont V1 comparison"
-                            }`
-                      }
-                      title={
-                        stat.score === null
-                          ? "Not available"
-                          : `${Math.round(stat.score)}/100 — ${
-                              stat.prototype
-                                ? "prototype rating"
-                                : "Vermont V1 comparison"
-                            }; more fill is better`
-                      }
-                    >
-                      <span
-                        style={{
-                          width: `${stat.score ?? 0}%`,
-                        }}
-                      />
-                    </span>
+      <dd>
+        <span
+          className="bar"
+          role={stat.score === null ? undefined : "meter"}
+          aria-label={`${stat.label}: ${stat.value}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={stat.score ?? undefined}
+          aria-valuetext={
+            stat.score === null
+              ? "Not available"
+              : `${Math.round(stat.score)} out of 100; more fill is better${
+                  stat.prototype
+                    ? "; prototype rating"
+                    : "; Vermont V1 comparison"
+                }`
+          }
+          title={
+            stat.score === null
+              ? "Not available"
+              : `${Math.round(stat.score)}/100 — ${
+                  stat.prototype
+                    ? "prototype rating"
+                    : "Vermont V1 comparison"
+                }; more fill is better`
+          }
+        >
+          <AnimatedBar width={stat.score ?? 0} />
+        </span>
 
-<span className="comparison-value">
-  {stat.prototype ? stat.key === "liftAccess"
-    ? resort.liftAccess.label
-    : stat.key === "affordability"
-      ? resort.affordability.label
-      : stat.value
-    : stat.value}
+        <span className="comparison-value">
+          {stat.value}
+        </span>
+      </dd>
+    </div>
+  ))}
+</dl>
 
-  {!stat.prototype && stat.detail && <small>{stat.detail}</small>}
-</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
 
 
 
@@ -249,7 +243,7 @@ export default async function ResortPage({ params }: ResortPageProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Visit {resort.name} website ↗
+            Visit {resort.name} website  &#x2197;
           </a>
         </div>
       </article>

@@ -19,13 +19,26 @@ export function isValidMetric(value: number | null): value is number {
 /** Use the entire V1 dataset as reference, never filtered results or a future selection.
  * Equal values earn 50. Missing values are unscored; values outside bounds are clamped.
  */
-export function normalize(value: number | null, reference: readonly (number | null)[]): number | null {
+export function normalize(
+  value: number | null,
+  reference: readonly (number | null)[]
+): number | null {
   if (!isValidMetric(value)) return null;
+
   const valid = reference.filter(isValidMetric);
   if (!valid.length) return null;
-  const min = Math.min(...valid), max = Math.max(...valid);
+
+  const min = Math.min(...valid);
+  const max = Math.max(...valid);
+
   if (min === max) return 50;
-  return Math.max(0, Math.min(100, (value - min) / (max - min) * 100));
+
+  const normalized = (value - min) / (max - min);
+
+  return Math.max(
+    10,
+    Math.min(100, normalized * 90 + 10)
+  );
 }
 
 export function metricValue(resort: Resort, key: MetricKey): number | null {
