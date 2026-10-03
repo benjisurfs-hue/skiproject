@@ -341,14 +341,14 @@ body {
   padding: 0;
   height: var(--toolbar-height);
   overflow: hidden;
-  background: #000;
+  background: #1368B3;
 }
 
 .toolbar-scroll-progress {
   position: absolute;
   inset: 0 auto 0 0;
-  height: 100%;
-  background: #138a4b;
+  height: %;
+  background: #235B8C;
   z-index: 0;
   pointer-events: none;
 }
