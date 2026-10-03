@@ -388,7 +388,7 @@ style={{ width: `${progressWidth}%` }}  />
       <div className="filter-sheet" ref={menuSheet} role="dialog" aria-modal="true" aria-label="Filter and sort resorts" onKeyDown={keepFocusInMenu}>
       <section id="filter-sort-panel" className="selection-panel" data-figma-node="626:2499" aria-label="Filter and sort resorts" onFocus={revealFocusedOption}>
         <div className="sort-section">
-          <h1 ref={panelHeading} tabIndex={-1}>Sort Resorts By:</h1>
+          <h3 ref={panelHeading} tabIndex={-1}>Sort Resorts By:</h3>
           <div className="options sort-options" role="radiogroup" aria-label="Sort resorts">
 {sortOptions.map((option, index) => {
 const SortIcon = sortIcons[option.icon];
@@ -417,14 +417,14 @@ const SortIcon = sortIcons[option.icon];
           </div>
         </div>
         <div className="filter-section">
-          <h1>By Multi-pass</h1>
+          <h3>By Multi-pass</h3>
           <div className="options" role="group" aria-label="Multi-pass filters">
             {passFilters.map(filter => <label className="filter-option" key={filter.key}>
               <input className="sr-only" type="checkbox" checked={selectedPasses.includes(filter.key)} onChange={() => togglePass(filter.key)} />
               <span className="filter-mark"><Icon node="217:12197" name="imgIconCheck" size={24} /></span><span>{filter.label}</span>
             </label>)}
           </div>
-   <h1 className="state-filter-heading">By State</h1>
+   <h3 className="state-filter-heading">By State</h3>
 
   <div className="options" role="group" aria-label="State filters">
     {states.map(state => (

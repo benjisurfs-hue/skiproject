@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import BackToList from "./back-to-list"; 
 import { notFound } from "next/navigation";
 import ResortGallery from "../../resort-gallery";
 import ResortMetadata from "../../resort-metadata";
@@ -15,7 +16,7 @@ type ResortPageProps = {
   }>;
 };
 import AnimatedBar from "./animated-bar";
- 
+
 export const dynamic = "force-dynamic";
 
 export default async function ResortPage({ params }: ResortPageProps) {
@@ -236,13 +237,7 @@ export default async function ResortPage({ params }: ResortPageProps) {
             </dl>
           </section>
 <div className="resort-links">
-          <a
-            className="resort-link"
-            href="/"
-            rel="noopener noreferrer"
-          >&#x20EA;
-            Back to list
-          </a>
+<BackToList />
 
           {/* External website */}
           <a

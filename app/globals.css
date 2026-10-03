@@ -77,7 +77,7 @@ ul { list-style: none; padding: 0; }
 .resort-link:active { background: #efefef; text-decoration: none; }
 .selection-panel { max-width: 402px; min-height: calc(100dvh - 58px); padding: 20px 10px; }
 .selection-panel h1, .selection-panel h2 { font-size: 14px; line-height: 20px; font-weight: 500; margin-bottom: 16px; }.selection-panel h2 { margin-top: 16px; color: var(--active); }
-.options { display: flex; flex-direction: column; gap: 16px; }
+.options { display: flex; flex-direction: column; gap: 10px; margin: 1vh 0;}
 .options button { display: flex; align-items: center; gap: 16px; text-align: left; font-size: 20px; line-height: 28px; font-weight: 700; padding: 0; min-height: 28px; }
 .options img { flex-shrink: 0; }.options .selected { color: var(--active); }.options button:disabled { color: #cacaca; }
 footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
@@ -112,17 +112,16 @@ footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
 .filter-navigation[open] { position: static; }
 .filter-navigation[open] > .toolbar { position: fixed; }
 .selection-panel { padding: 10px 0 calc(var(--toolbar-height) + env(safe-area-inset-bottom, 0px)); }
-.sort-section { padding: 10px 10px 24px; border-bottom: 1px solid var(--border); }
+.sort-section { padding: 10px 10px 0; border-bottom: 1px solid var(--border); }
 .filter-section { padding: 20px 10px 24px; }
 .selection-panel h2 { margin: 0 0 16px; color: var(--foreground); }
-.sort-option, .filter-option { position: relative; display: flex; align-items: center; font-size: 20px; line-height: 28px; font-weight: 700; cursor: pointer; min-height: 28px; padding: .2rem;}
+.sort-option, .filter-option { position: relative; display: flex; align-items: center; font-size: 14px; line-height: 28px; font-weight: 400; cursor: pointer; min-height: 28px; padding: .2rem;}
 /* Keep Figma's 44px row cadence with full-height touch targets. */
 .sort-option::before, .filter-option::before { content: ""; position: absolute; inset: -8px 0; }
 .sort-option:has(input:focus-visible), .filter-option:has(input:focus-visible) { outline: 2px solid var(--bar); outline-offset: 4px; }
-.sort-options .selected { color: #1860fa; }
 .sort-option input:checked + span { text-decoration: underline; text-underline-offset: 4px; }
 .filter-option { gap: 16px; color: #52555B; }
-.filter-mark { width: 24px; height: 24px; flex-shrink: 0; }
+.filter-mark { width: 16px; height: 16px; flex-shrink: 0; }
 .filter-option input:not(:checked):not(:disabled) + .filter-mark img { visibility: hidden; }
 .filter-option input:not(:checked):not(:disabled) + .filter-mark { border: 1px solid var(--border); border-radius: 4px; }
 /* Keep the Figma return bar reachable while the menu scrolls. */
@@ -314,9 +313,6 @@ body {
 .sort-option svg {
   flex: 0 0 auto;
 }
-.state-filter-heading {
-  margin-top: 40px;
-}
 
 .toolbar-scroll-progress {
   position: absolute;
@@ -418,17 +414,17 @@ body {
 }
 
 label.sort-option.selected {
-    background: rgba(82, 85, 91, 1);
+    background: #FFF3D8;
     padding: .2rem;
-    color: white;
     transition: 400ms;
     border-radius: 4px;
 }
 
 input + .lucide {
-      width: 30px;
-  height: 30px;
+      width: 16px;
+  height: 16px;
   flex-shrink: 0;
+  margin-left: 2vw;
 }
 
 .bar-fill {
@@ -459,4 +455,8 @@ input + .lucide {
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.filter-section h3, .sort-section h3 {
+    font-family: var(--font-ibm-plex-serif), serif; font-size: 12px; margin-botton: 1vh;
 }
