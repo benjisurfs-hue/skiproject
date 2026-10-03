@@ -3,8 +3,7 @@ import { resorts } from "../data/resorts";
 import { mergeResortSheet } from "./resort-sheet";
 
 const sheetId = "10l7L6Sr2DClVc439oWUYPV1gKZS_tHGvUOcVc1xjzBo";
-const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Resorts`;
-
+const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Resorts&headers=1`;
 export async function getResorts() {
   try {
 const response = await fetch(sheetUrl, {

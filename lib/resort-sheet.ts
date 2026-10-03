@@ -113,10 +113,14 @@ function resortRowError(id: string, error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
   console.error(`Skipping resort "${id || "unknown"}": ${message}`);
 }
-/** Join on stable IDs. The sheet owns rows; local files supply photos and editorial fields. */
+
 /** Join on stable IDs. The sheet owns rows; local files supply photos and editorial fields. */
 export function mergeResortSheet(csv: string, originals: readonly Resort[]): Resort[] {
-  const table: string[][] = parse(csv, { bom: true, skip_empty_lines: true });
+  const table: string[][] = parse(csv, {
+    bom: true,
+    skip_empty_lines: true,
+  });
+
   const headers = table.shift();
 
   if (
@@ -126,6 +130,8 @@ export function mergeResortSheet(csv: string, originals: readonly Resort[]): Res
   ) {
     throw new Error("Missing or duplicate Resorts headers");
   }
+  
+
 
   const rows = table.filter(row => row.some(cell => cell.trim()));
 
