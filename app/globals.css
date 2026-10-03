@@ -158,8 +158,18 @@ footer { padding: 24px 10px; font-size: 12px; line-height: 20px; }
 
 
 button.back-to-top {
-    background: #333;
-    color: #fff;
+  width: fit-content;
+  padding: 12px 16px;
+  border: 1px solid #52555B;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #52555B;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .filter-navigation > .toolbar,

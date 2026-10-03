@@ -460,6 +460,6 @@ const SortIcon = sortIcons[option.icon];
       {!visibleResorts.length && <p className="empty-results">No resorts match these filters. <button type="button" onClick={openMenu}>Adjust filters</button></p>}
       <footer>Northeast Ski Areas V1 · Local data · Prototype ratings</footer>
     </main>
-    {!menuOpen && showBackToTop && <button type="button" className="back-to-top" aria-label="Back to top" onClick={backToTop}>↑ <span>Back to top</span></button>}
+    {!menuOpen && showBackToTop && <button type="button" className="back-to-top" aria-label="Back to top" onClick={backToTop}>↑ <span>To top</span></button>}
   </div>;
 }
