@@ -246,7 +246,7 @@ export default async function ResortPage({ params }: ResortPageProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Visit {resort.name} website
+            {resort.name} website
           </a></div>
         </div>
       </article>
