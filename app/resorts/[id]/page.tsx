@@ -235,6 +235,14 @@ export default async function ResortPage({ params }: ResortPageProps) {
               </div>
             </dl>
           </section>
+<div className="resort-links">
+          <a
+            className="resort-link"
+            href="/"
+            rel="noopener noreferrer"
+          >&#x20EA;
+            Back to list
+          </a>
 
           {/* External website */}
           <a
@@ -243,8 +251,8 @@ export default async function ResortPage({ params }: ResortPageProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Visit {resort.name} website  &#x2197;
-          </a>
+            Visit {resort.name} website
+          </a></div>
         </div>
       </article>
     </main>

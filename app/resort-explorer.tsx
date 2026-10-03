@@ -137,7 +137,7 @@ function ResortCard({ resort, priority }: { resort: Resort; priority: boolean })
   className="resort-link"
   href={`/resorts/${resort.id}`}
 >
-  Details
+  Ski Area Details &#x2192;
 </Link>    </div>
   </article>;
 }
@@ -356,7 +356,7 @@ const visibleResorts = sortResorts(
     setSelectedPasses(current => current.includes(pass) ? current.filter(item => item !== pass) : [...current, pass]);
     previousScroll.current = 0;
   }
-  const backButton = <button type="button" onClick={back}><Icon node="217:12197" name="imgIconChevronLeft" size={24} /><span>Back To Results</span></button>;
+  const backButton = <button type="button" onClick={back}><span>&#x2190;  Back To Results</span></button>;
   return <div className="site-shell" onKeyDown={(event) => { if (event.key === "Escape" && navigation.current?.open) back(); }}>
     <a href="#main" className="skip-link" tabIndex={menuOpen ? -1 : undefined} aria-hidden={menuOpen || undefined}>Skip to resorts</a>
     <details className="filter-navigation" ref={navigation} onToggle={handleNavigationToggle}>

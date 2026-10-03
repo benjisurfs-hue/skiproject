@@ -59,22 +59,22 @@ ul { list-style: none; padding: 0; }
 .terrain-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .blue-run, .black-run { display: block; width: 12px; height: 12px; background: #1860fa; }.black-run { background: black; transform: rotate(-45deg); }
 .resort-link {
-  display: inline-flex;
-  align-items: center;
+  display: inline-flex; align-self: center;
+  align-items: center; 
   width: fit-content;
   padding: 12px 16px;
-  border: 1px solid #006931;
+  border: 1px solid #52555B;
   border-radius: 4px;
   font-size: 10px;
   line-height: 12px;
   font-weight: 700;
   letter-spacing: 0;
-  color: #00783e;
+  color: #52555B;
   text-decoration: none;
   white-space: nowrap;
 }
-.resort-link:hover { text-decoration: underline; text-underline-position: from-font; }
-.resort-link:active { background: #ebf9ef; text-decoration: none; }
+.resort-link:hover { background: #efefef; text-decoration: underline; text-underline-position: from-font; }
+.resort-link:active { background: #efefef; text-decoration: none; }
 .selection-panel { max-width: 402px; min-height: calc(100dvh - 58px); padding: 20px 10px; }
 .selection-panel h1, .selection-panel h2 { font-size: 14px; line-height: 20px; font-weight: 500; margin-bottom: 16px; }.selection-panel h2 { margin-top: 16px; color: var(--active); }
 .options { display: flex; flex-direction: column; gap: 16px; }
@@ -445,4 +445,18 @@ input + .lucide {
 .filtericon {
     font-size: 20px;    
     font-weight: bold;
+}
+
+.resort-links {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.resort-links .resort-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
