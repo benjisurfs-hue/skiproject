@@ -109,109 +109,256 @@ function createBlankResort(id: string): Resort {
     lastVerified: null,
   };
 }
-
+function resortRowError(id: string, error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Skipping resort "${id || "unknown"}": ${message}`);
+}
+/** Join on stable IDs. The sheet owns rows; local files supply photos and editorial fields. */
 /** Join on stable IDs. The sheet owns rows; local files supply photos and editorial fields. */
 export function mergeResortSheet(csv: string, originals: readonly Resort[]): Resort[] {
   const table: string[][] = parse(csv, { bom: true, skip_empty_lines: true });
   const headers = table.shift();
-  if (!headers || new Set(headers).size !== headers.length || sheetColumns.some(c => !headers.includes(c))) throw new Error("Missing or duplicate Resorts headers");
+
+  if (
+    !headers ||
+    new Set(headers).size !== headers.length ||
+    sheetColumns.some(c => !headers.includes(c))
+  ) {
+    throw new Error("Missing or duplicate Resorts headers");
+  }
+
   const rows = table.filter(row => row.some(cell => cell.trim()));
-  if (!rows.length) throw new Error("Resorts sheet is empty");
+
+  if (!rows.length) {
+    throw new Error("Resorts sheet is empty");
+  }
+
   const seen = new Set<string>();
+
   return rows.flatMap(cells => {
-    const row = Object.fromEntries(headers.map((h, i) => [h, cells[i]]));
+    const row = Object.fromEntries(
+      headers.map((h, i) => [h, cells[i] ?? ""])
+    );
+
     const id = row.id.trim();
-    if (!id || seen.has(id)) throw new Error("Missing or duplicate resort ID");
-    seen.add(id);
-    if (flag(row.published) === false) return [];
-const base = originals.find(r => r.id === id) ?? createBlankResort(id);
-const r: Resort = structuredClone(base);
-    for (const key of ["slug", "name", "state", "region"] as const) {
-      if (!row[key].trim()) throw new Error(`Missing ${key} for ${id}`);
-      r[key] = row[key];
+
+    if (!id) {
+      resortRowError("", new Error("Missing resort ID"));
+      return [];
     }
-    for (const key of ["tier", "character", "description"] as const) r[key] = row[key] || null;
-    for (const key of ["annualSnowfallIn", "skiableAcres", "verticalFt", "trailCount", "liftCount", "summitElevationFt", "baseElevationFt"] as const) r[key] = number(row[key], key);
-    const latitude = number(row.latitude, "latitude", -90, 90);
-    const longitude = number(row.longitude, "longitude", -180, 180);
-    if ((latitude === null) !== (longitude === null)) throw new Error("Both coordinates are required");
-    r.coordinates = latitude === null || longitude === null ? null : { latitude, longitude };
-    const passes: unknown = row.passes.trim().startsWith("[") ? JSON.parse(row.passes) : row.passes.split(",").map(p => p.trim()).filter(Boolean);
-    if (!Array.isArray(passes) || passes.some(p => !["Ikon", "Epic", "Indy"].includes(p))) throw new Error("Invalid pass list");
-    r.passes = [...new Set(passes)] as Pass[];
-    r.liftAccess.score = score(row.liftAccessScore, base.liftAccess.score);
-    r.liftAccess.label = row.liftAccessLabel || base.liftAccess.label;
-    r.affordability.score = score(row.affordabilityScore, base.affordability.score);
-    r.affordability.label = row.affordabilityLabel || base.affordability.label;
-    r.affordability.priceBand = row.priceBand;
-    r.season.projectedOpening = date(row.projectedOpening);
-    r.lastVerified = date(row.lastVerified);
-    const beginner = number(row.beginner, "beginner", 0, 100);
-    const intermediate = number(row.intermediate, "intermediate", 0, 100);
-    const advanced = number(row.advanced, "advanced", 0, 100);
-    if ([beginner, intermediate, advanced].every(n => n === null)) r.terrain = null;
-    else if (beginner === null || intermediate === null || advanced === null) throw new Error("Complete all three terrain percentages, or leave all blank");
-    else r.terrain = { beginner, intermediate, advanced };
-    r.terrainParks = parks(row.terrainParks, base.terrainParks);
-    const sheetHighlights = [
-  { text: row.highlight1, iconSrc: row.highlight1Icon },
-  { text: row.highlight2, iconSrc: row.highlight2Icon },
-  { text: row.highlight3, iconSrc: row.highlight3Icon },
-].filter(highlight => highlight.text.trim() && highlight.iconSrc.trim());
-const sheetPhotos = [
-  row.photo1,
-  row.photo2,
-  row.photo3,
-]
-  .map(src => src.trim())
-  .filter(Boolean);
 
-if (sheetPhotos.length > 0) {
-  r.media = sheetPhotos.map((src, index) => ({
-    kind: "image" as const,
-    role: "resort" as const,
-    src,
-    alt: `${r.name} ski area${index === 0 ? "" : ` photo ${index + 1}`}`,
-  }));
-}
+    if (seen.has(id)) {
+      throw new Error(`Duplicate resort ID: ${id}`);
+    }
 
-const sheetPros = [
-  row.pro1,
-  row.pro2,
-  row.pro3,
-]
-  .map(item => item.trim())
-  .filter(Boolean);
+    seen.add(id);
 
-const sheetCons = [
-  row.con1,
-  row.con2,
-  row.con3,
-]
-  .map(item => item.trim())
-  .filter(Boolean);
+    try {
+      if (flag(row.published) === false) {
+        return [];
+      }
 
-if (sheetPros.length > 0) {
-  r.pros = sheetPros;
-}
+      const base =
+        originals.find(r => r.id === id) ?? createBlankResort(id);
 
-if (sheetCons.length > 0) {
-  r.cons = sheetCons;
-}
+      const r: Resort = structuredClone(base);
 
-if (
-  row.website &&
-  !["http:", "https:"].includes(new URL(row.website).protocol)
-) {
-  throw new Error("Invalid website URL");
-}
+      for (const key of ["slug", "name", "state", "region"] as const) {
+        if (!row[key].trim()) {
+          throw new Error(`Missing ${key} for ${id}`);
+        }
 
-r.website = row.website;
-    r.nycTransportation.driveTime = row.nycDriveTime || null;
-    const hours = row.nycDriveTime.match(/^~?\s*(\d+(?:\.\d+)?)\s*hours?\s*$/i);
-    r.nycTransportation.driveTimeHours = hours ? Number(hours[1]) : null;
-    r.nycTransportation.busAvailable = flag(row.nycBusAvailable);
-    if (r.nycTransportation.busAvailable === false) r.nycTransportation.transitOptions = r.nycTransportation.transitOptions.filter(o => o.type !== "bus");
-    return [r];
+        r[key] = row[key];
+      }
+
+      for (const key of ["tier", "character", "description"] as const) {
+        r[key] = row[key] || null;
+      }
+
+      for (
+        const key of [
+          "annualSnowfallIn",
+          "skiableAcres",
+          "verticalFt",
+          "trailCount",
+          "liftCount",
+          "summitElevationFt",
+          "baseElevationFt",
+        ] as const
+      ) {
+        r[key] = number(row[key], key);
+      }
+
+      const latitude = number(row.latitude, "latitude", -90, 90);
+      const longitude = number(row.longitude, "longitude", -180, 180);
+
+      if ((latitude === null) !== (longitude === null)) {
+        throw new Error("Both coordinates are required");
+      }
+
+      r.coordinates =
+        latitude === null || longitude === null
+          ? null
+          : { latitude, longitude };
+
+      const passes: unknown = row.passes.trim().startsWith("[")
+        ? JSON.parse(row.passes)
+        : row.passes
+            .split(",")
+            .map(p => p.trim())
+            .filter(Boolean);
+
+      if (
+        !Array.isArray(passes) ||
+        passes.some(p => !["Ikon", "Epic", "Indy"].includes(p))
+      ) {
+        throw new Error("Invalid pass list");
+      }
+
+      r.passes = [...new Set(passes)] as Pass[];
+
+      r.liftAccess.score = score(
+        row.liftAccessScore,
+        base.liftAccess.score
+      );
+      r.liftAccess.label =
+        row.liftAccessLabel || base.liftAccess.label;
+
+      r.affordability.score = score(
+        row.affordabilityScore,
+        base.affordability.score
+      );
+      r.affordability.label =
+        row.affordabilityLabel || base.affordability.label;
+      r.affordability.priceBand = row.priceBand;
+
+      r.season.projectedOpening = date(row.projectedOpening);
+      r.lastVerified = date(row.lastVerified);
+
+      const beginner = number(row.beginner, "beginner", 0, 100);
+      const intermediate = number(
+        row.intermediate,
+        "intermediate",
+        0,
+        100
+      );
+      const advanced = number(row.advanced, "advanced", 0, 100);
+
+      if ([beginner, intermediate, advanced].every(n => n === null)) {
+        r.terrain = null;
+      } else if (
+        beginner === null ||
+        intermediate === null ||
+        advanced === null
+      ) {
+        throw new Error(
+          "Complete all three terrain percentages, or leave all blank"
+        );
+      } else {
+        r.terrain = { beginner, intermediate, advanced };
+      }
+
+      r.terrainParks = parks(
+        row.terrainParks,
+        base.terrainParks
+      );
+
+      // Highlights
+      const sheetHighlights = [
+        { text: row.highlight1, iconSrc: row.highlight1Icon },
+        { text: row.highlight2, iconSrc: row.highlight2Icon },
+        { text: row.highlight3, iconSrc: row.highlight3Icon },
+      ].filter(
+        highlight =>
+          highlight.text.trim() && highlight.iconSrc.trim()
+      );
+
+      if (sheetHighlights.length > 0) {
+        r.highlights = sheetHighlights;
+      }
+
+      // Photos
+      const sheetPhotos = [
+        ...new Set(
+          [row.photo1, row.photo2, row.photo3]
+            .map(src => src.trim())
+            .filter(Boolean)
+        ),
+      ];
+
+      if (sheetPhotos.length > 0) {
+        r.media = sheetPhotos.map((src, index) => ({
+          kind: "image" as const,
+          role: "resort" as const,
+          src,
+          alt: `${r.name} ski area${
+            index === 0 ? "" : ` photo ${index + 1}`
+          }`,
+        }));
+      }
+
+      // Pros and cons
+      const sheetPros = [
+        row.pro1,
+        row.pro2,
+        row.pro3,
+      ]
+        .map(item => item.trim())
+        .filter(Boolean);
+
+      const sheetCons = [
+        row.con1,
+        row.con2,
+        row.con3,
+      ]
+        .map(item => item.trim())
+        .filter(Boolean);
+
+      if (sheetPros.length > 0) {
+        r.pros = sheetPros;
+      }
+
+      if (sheetCons.length > 0) {
+        r.cons = sheetCons;
+      }
+
+      // Website
+      if (
+        row.website &&
+        !["http:", "https:"].includes(
+          new URL(row.website).protocol
+        )
+      ) {
+        throw new Error("Invalid website URL");
+      }
+
+      r.website = row.website;
+
+      // NYC transportation
+      r.nycTransportation.driveTime =
+        row.nycDriveTime || null;
+
+      const hours = row.nycDriveTime.match(
+        /^~?\s*(\d+(?:\.\d+)?)\s*hours?\s*$/i
+      );
+
+      r.nycTransportation.driveTimeHours =
+        hours ? Number(hours[1]) : null;
+
+      r.nycTransportation.busAvailable =
+        flag(row.nycBusAvailable);
+
+      if (r.nycTransportation.busAvailable === false) {
+        r.nycTransportation.transitOptions =
+          r.nycTransportation.transitOptions.filter(
+            option => option.type !== "bus"
+          );
+      }
+
+      return [r];
+    } catch (error) {
+      resortRowError(id, error);
+      return [];
+    }
   });
 }

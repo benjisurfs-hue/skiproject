@@ -14,6 +14,9 @@ type ResortPageProps = {
     id: string;
   }>;
 };
+
+export const dynamic = "force-dynamic";
+
 export default async function ResortPage({ params }: ResortPageProps) {
   const { id } = await params;
   const resorts = await getResorts();
